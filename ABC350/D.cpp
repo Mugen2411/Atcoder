@@ -109,37 +109,35 @@ private:
 #endif //___INCLUDED_UNIONFIND___
 
 #include <iostream>
+#include <unordered_map>
 
 int main()
 {
-    size_t N, Q;
-    std::cin >> N >> Q;
+    int64_t N, M;
+    std::cin >> N >> M;
 
-    UnionFind unionfind(N);
+    UnionFind uf(N);
 
-    while (Q--)
+    for (int64_t i = 0; i < M; ++i)
     {
-        int P;
         int64_t A, B;
-        std::cin >> P >> A >> B;
-
-        switch (P)
-        {
-        case 0:
-            unionfind.Merge(A, B);
-            break;
-        case 1:
-            if (unionfind.IsSame(A, B))
-            {
-                std::cout << "Yes" << std::endl;
-            }
-            else
-            {
-                std::cout << "No" << std::endl;
-            }
-            break;
-        }
+        std::cin >> A >> B;
+        --A, --B;
+        uf.Merge(A, B);
     }
 
+    std::unordered_map<int64_t, int64_t> groups;
+    for (int64_t i = 0; i < N; ++i)
+    {
+        ++groups[uf.Find(i)];
+    }
+
+    int64_t sum = 0;
+    for (auto &i : groups)
+    {
+        sum += (i.second) * (i.second - 1) / 2;
+    }
+
+    std::cout << sum - M << std::endl;
     return 0;
 }
