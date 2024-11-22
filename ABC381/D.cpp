@@ -11,23 +11,10 @@ int main()
     {
         std::cin >> A[i];
     }
-    std::vector<std::pair<int64_t, int64_t>> leng;
-    for (int i = 0; i < N; ++i)
-    {
-        if (leng.empty() || leng.back().first != A[i])
-        {
-            leng.push_back({A[i], 1});
-            continue;
-        }
-        else
-        {
-            ++leng.back().second;
-        }
-    }
     std::unordered_set<int> set;
     auto f = [&](int left, int right) -> bool
     {
-        if (leng[left].second == 2 && leng[right].second == 2 && set.count(leng[right].first) == 0)
+        if (A[right] == A[right - 1] && set.count(A[right]) == 0)
         {
             return true;
         }
@@ -35,31 +22,44 @@ int main()
     };
     int64_t ans = 0;
     int right = 0;
-    for (int left = 0; left < leng.size(); ++left)
+    for (int left = 0; left < N; left += 2)
     {
-        while (right < leng.size() && f(left, right))
+        while (right < N && f(left, right))
         {
-            set.insert(leng[right].first);
-            right++;
+            set.insert(A[right]);
+            right += 2;
         }
-        int64_t size = (right - left) * 2;
-        if (left > 0 && set.count(leng[left - 1].first) == 0 && leng[left - 1].second > 2)
-        {
-            size += 2;
-        }
-        if (right < leng.size() && set.count(leng[right].first) == 0 && leng[right].second > 2)
-        {
-            size += 2;
-        }
+        int64_t size = (right - left);
 
         ans = std::max(ans, size);
         if (left == right)
         {
-            ++right;
+            right += 2;
         }
         else
         {
-            set.erase(leng[left].first);
+            set.erase(A[left]);
+        }
+    }
+    set.clear();
+    right = 1;
+    for (int left = 1; left < N; left += 2)
+    {
+        while (right < N && f(left, right))
+        {
+            set.insert(A[right]);
+            right += 2;
+        }
+        int64_t size = (right - left);
+
+        ans = std::max(ans, size);
+        if (left == right)
+        {
+            right += 2;
+        }
+        else
+        {
+            set.erase(A[left]);
         }
     }
     std::cout << ans;
