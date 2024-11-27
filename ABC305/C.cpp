@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 #include <cstdint>
+#include <iostream>
 
 /**
     @brief	二次元のグリッドを表すクラス
@@ -34,7 +35,7 @@ public:
 
         @return         目的の座標の参照
      */
-    T &at(int64_t x, int64_t y)
+    T &Ref(int64_t x, int64_t y)
     {
         assert(0 <= x && x < m_width);
         assert(0 <= y && y < m_height);
@@ -66,7 +67,31 @@ private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
     int64_t m_height;      //!< 高さ
+
+    template <class U>
+    friend std::istream &operator>>(std::istream &stream, Grid2D<U> &dest);
 };
+
+/**
+    @brief	        入力ストリーム演算子
+
+    @tparam	T       Grid2Dに格納する型
+    @param[in]	    stream  入力ストリーム
+    @param[in]	    dest    入力を受け付ける先のGrid2D
+    @return                 入力ストリーム
+ */
+template <class T>
+std::istream &operator>>(std::istream &stream, Grid2D<T> &dest)
+{
+    for (int64_t y = 0; y < dest.m_height; ++y)
+    {
+        for (int64_t x = 0; x < dest.m_width; ++x)
+        {
+            stream >> dest.Ref(x, y);
+        }
+    }
+    return stream;
+}
 
 #endif //__INCLUDED_GRID2D__
 
@@ -76,14 +101,11 @@ int main()
 {
     int64_t H, W;
     std::cin >> H >> W;
+    //****************************************
+    // 一撃で入力可能！
     Grid2D<char> grid(H, W, '\0');
-    for (int y = 0; y < H; ++y)
-    {
-        for (int x = 0; x < W; ++x)
-        {
-            std::cin >> grid.at(x, y);
-        }
-    }
+    std::cin >> grid;
+    //****************************************
 
     int64_t beginX = 1000, endX = -1;
     int64_t beginY = 1000, endY = -1;
@@ -92,7 +114,7 @@ int main()
     {
         for (int x = 0; x < W; ++x)
         {
-            if (grid.at(x, y) == '#')
+            if (grid.Ref(x, y) == '#')
             {
                 if (beginX > x)
                 {
@@ -118,7 +140,7 @@ int main()
     {
         for (int x = beginX; x <= endX; ++x)
         {
-            if (grid.at(x, y) != '#')
+            if (grid.Ref(x, y) != '#')
             {
                 std::cout << y + 1 << " " << x + 1;
                 return 0;
