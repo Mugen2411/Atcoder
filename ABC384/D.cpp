@@ -31,9 +31,10 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
 #include <vector>
 #include <algorithm>
 #include <iterator>
+#include <cassert>
 
 /**
-    @brief	    累積和
+    @brief        累積和
 
     @tparam     Iterator   範囲指定に使用するイテレータの型
  */
@@ -44,9 +45,9 @@ public:
     using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
 
     /**
-        @brief	コンストラクタ
+        @brief    コンストラクタ
 
-        @param[in]	rawData     元となるデータ
+        @param[in]    rawData     元となるデータ
     */
     PrefixSum(Iterator beginItr, Iterator endItr)
         : m_data()
@@ -62,10 +63,10 @@ public:
     }
 
     /**
-        @brief	    累積和の取得
+        @brief        累積和の取得
 
-        @param[in]	targetIdx   加算を終了するインデックス
-        @param[in]	offsetIdx   加算を開始するインデックス
+        @param[in]    targetIdx   加算を終了するインデックス
+        @param[in]    offsetIdx   加算を開始するインデックス
         @return                 累積和
      */
     T GetSum(size_t targetIdx, size_t offsetIdx)
