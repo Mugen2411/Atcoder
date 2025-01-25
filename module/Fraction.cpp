@@ -274,33 +274,3 @@ private:
 };
 
 #endif //___INCLUDED_FRACTION___
-
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-int main()
-{
-    size_t N;
-    std::cin >> N;
-    std::vector<int64_t> A(N);
-    for (int i = 0; i < N; ++i)
-    {
-        std::cin >> A[i];
-    }
-    if (N == 2)
-    {
-        std::cout << "Yes";
-        return 0;
-    }
-    for (int i = 1; i < N - 1; ++i)
-    {
-        if (Fraction(A[i - 1], A[i]) != Fraction(A[i], A[i + 1]))
-        {
-            std::cout << "No";
-            return 0;
-        }
-    }
-    std::cout << "Yes";
-    return 0;
-}
