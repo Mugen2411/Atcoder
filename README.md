@@ -1,2 +1,2 @@
 ﻿[![Mugen's GitHub stats](https://github-readme-stats.vercel.app/api?username=Mugen2411)](https://github.com/Mugen2411/Atcoder)
-[![Mugen's Atcoder Language Ranking](https://github-readme-stats.vercel.app/api/top-langs/?username=zizi4n5)](https://github.com/Mugen2411/Atcoder)
+[![Mugen's Atcoder Language Ranking](https://github-readme-stats.vercel.app/api/top-langs/?username=Mugen2411)](https://github.com/Mugen2411/Atcoder)
