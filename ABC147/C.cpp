@@ -56,11 +56,11 @@ public:
     }
 
     /**
-        @brief	インデックス[0,idx)をtrueで埋め、それ以外がfalseのビットマネージャ
+            @brief	インデックス[0,idx)をtrueで埋め、それ以外がfalseのビットマネージャ
 
-        @param[in]	idx インデックス
-        @return 概要通りのビットマネージャ
-     */
+            @param[in]	idx インデックス
+            @return 概要通りのビットマネージャ
+         */
     static BitManager Filled(int idx)
     {
         BitManager retval = AllFalse();
@@ -243,3 +243,63 @@ private:
 };
 
 #endif //___INCLUDED_BITMAN___
+
+#include <iostream>
+#include <vector>
+
+int main()
+{
+    int N;
+    std::cin >> N;
+    struct STATEMENT
+    {
+        int idx;
+        bool val;
+    };
+    std::vector<std::vector<STATEMENT>> statement(N);
+
+    for (int a = 0; a < N; ++a)
+    {
+        int A;
+        std::cin >> A;
+
+        while (A--)
+        {
+            int x, y;
+            std::cin >> x >> y;
+            --x;
+            statement[a].push_back(STATEMENT{x, y == 1});
+        }
+    }
+
+    BitManager end = BitManager::Onehot(N);
+    int ans = 0;
+    for (BitManager cur = BitManager::AllFalse(); cur != end; ++cur)
+    {
+        bool isHonest = true;
+
+        for (int a = 0; a < N; ++a)
+        {
+            if (!cur.Get(a))
+            {
+                continue;
+            }
+            for (auto itr = statement[a].begin(); itr != statement[a].end(); ++itr)
+            {
+                if (cur.Get(itr->idx) != itr->val)
+                {
+                    isHonest = false;
+                }
+            }
+        }
+
+        if (isHonest)
+        {
+            ans = std::max(ans, cur.GetCount());
+        }
+    }
+
+    std::cout << ans;
+
+    return 0;
+}
