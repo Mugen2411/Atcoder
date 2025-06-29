@@ -1,8 +1,4 @@
-﻿#include <vector>
-#include <iostream>
-#include <array>
-
-#ifndef ___INCLUDED_BITMAN___
+﻿#ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
 #include <iostream>
@@ -13,6 +9,12 @@
 class BitManager
 {
 public:
+    /**
+        @brief	デフォルトコンストラクタ
+    */
+    BitManager()
+        : m_data(0ull) {};
+
     /**
         @brief	コンストラクタ
 
@@ -38,7 +40,7 @@ public:
      */
     static BitManager AllTrue()
     {
-        return BitManager(0xffffffffffffffffull);
+        return Filled(NUM_DIGIT);
     }
 
     /**
@@ -51,6 +53,35 @@ public:
     static BitManager Difference(const BitManager &lhs, const BitManager &rhs)
     {
         return BitManager(lhs.m_data ^ rhs.m_data);
+    }
+
+    /**
+            @brief	インデックス[0,idx)をtrueで埋め、それ以外がfalseのビットマネージャ
+
+            @param[in]	idx インデックス
+            @return 概要通りのビットマネージャ
+         */
+    static BitManager Filled(int idx)
+    {
+        BitManager retval = AllFalse();
+        for (int i = 0; i < idx; ++i)
+        {
+            retval.Set(i, true);
+        }
+        return retval;
+    }
+
+    /**
+        @brief	1つの要素だけtrue、他がfalseのビットマネージャ
+
+        @param[in]	idx trueにするインデックス
+        @return 概要を満たすビットマネージャ
+     */
+    static BitManager Onehot(int idx)
+    {
+        BitManager retval = AllFalse();
+        retval.Set(idx, true);
+        return retval;
     }
 
     /**
@@ -145,6 +176,51 @@ public:
         std::cerr << std::endl;
     }
 
+    /**
+        @brief	前置インクリメント演算子
+
+        @return 自身の参照
+     */
+    BitManager &operator++()
+    {
+        ++m_data;
+        return *this;
+    }
+
+    /**
+        @brief	後置インクリメント演算子
+
+        @return インクリメント前のコピー
+     */
+    BitManager operator++(int)
+    {
+        BitManager retval = *this;
+        operator++();
+        return retval;
+    }
+
+    /**
+        @brief	等価演算子
+
+        @param[in]	rhs 比較対象
+        @return 自身と右辺が等しいか
+     */
+    bool operator==(const BitManager &rhs)
+    {
+        return m_data == rhs.m_data;
+    }
+
+    /**
+        @brief	不等価演算子
+
+        @param[in]	rhs 比較対象
+        @return 自身と右辺が等しくないか
+     */
+    bool operator!=(const BitManager &rhs)
+    {
+        return !operator==(rhs);
+    }
+
 private:
     /**
         @brief	インデックスが正しいか検証する
@@ -168,112 +244,62 @@ private:
 
 #endif //___INCLUDED_BITMAN___
 
+#include <iostream>
+#include <vector>
+
 int main()
 {
-    int N, M;
-    std::cin >> N >> M;
-
-    auto GetIdx = [N](int start, int goal)
+    int N;
+    std::cin >> N;
+    struct STATEMENT
     {
-        int idx = start * N + goal;
-        if (idx >= 64)
-        {
-            std::cerr << "index error!" << std::endl;
-        }
-        return idx;
+        int idx;
+        bool val;
     };
-    BitManager cur = BitManager::AllFalse();
-    while (M--)
+    std::vector<std::vector<STATEMENT>> statement(N);
+
+    for (int a = 0; a < N; ++a)
     {
-        int A, B;
-        std::cin >> A >> B;
-        --A, --B;
-        cur.Set(GetIdx(A, B), true);
-        cur.Set(GetIdx(B, A), true);
+        int A;
+        std::cin >> A;
+
+        while (A--)
+        {
+            int x, y;
+            std::cin >> x >> y;
+            --x;
+            statement[a].push_back(STATEMENT{x, y == 1});
+        }
     }
 
-    int ans = 0xff;
-    auto dfs = [&](auto self, BitManager curVal, int idx, std::array<char, 8> already)
+    BitManager end = BitManager::Onehot(N);
+    int ans = 0;
+    for (BitManager cur = BitManager::AllFalse(); cur != end; ++cur)
     {
-        // curVal.DebugOutput(curVal);
-        if (idx == N)
+        bool isHonest = true;
+
+        for (int a = 0; a < N; ++a)
         {
-            for (int i = 0; i < N; ++i)
+            if (!cur.Get(a))
             {
-                if (already[i] != 2)
-                {
-                    return;
-                }
+                continue;
             }
-            BitManager diff = BitManager::Difference(cur, curVal);
-            int tmp = diff.GetCount();
-
-            std::cerr << tmp << std::endl;
-            ans = std::min(ans, tmp / 2);
-            return;
-        }
-
-        if (already[idx] > 2)
-        {
-            std::cerr << "Logic Error!" << std::endl;
-            return;
-        }
-        if (already[idx] == 2)
-        {
-            self(self, curVal, idx + 1, already);
-        }
-        else if (already[idx] == 1)
-        {
-            for (int j = idx + 1; j < N; ++j)
+            for (auto itr = statement[a].begin(); itr != statement[a].end(); ++itr)
             {
-                if (!curVal.Get(GetIdx(idx, j)))
+                if (cur.Get(itr->idx) != itr->val)
                 {
-                    if (already[j] >= 2)
-                    {
-                        continue;
-                    }
-                    BitManager newVal = curVal;
-                    newVal.Set(GetIdx(idx, j), true);
-                    newVal.Set(GetIdx(j, idx), true);
-
-                    std::array<char, 8> newAlready = already;
-                    ++newAlready[idx];
-                    ++newAlready[j];
-                    self(self, newVal, idx + 1, newAlready);
+                    isHonest = false;
                 }
             }
         }
-        else
+
+        if (isHonest)
         {
-            for (int i = idx + 1; i < N - 1; ++i)
-            {
-                if (already[i] >= 2)
-                {
-                    continue;
-                }
-                for (int j = i + 1; j < N; ++j)
-                {
-                    if (already[j] >= 2)
-                    {
-                        continue;
-                    }
-                    BitManager newVal = curVal;
-                    newVal.Set(GetIdx(idx, j), true);
-                    newVal.Set(GetIdx(j, idx), true);
-                    newVal.Set(GetIdx(idx, i), true);
-                    newVal.Set(GetIdx(i, idx), true);
-
-                    std::array<char, 8> newAlready = already;
-                    newAlready[idx] += 2;
-                    ++newAlready[j];
-                    ++newAlready[i];
-                    self(self, newVal, idx + 1, newAlready);
-                }
-            }
+            ans = std::max(ans, cur.GetCount());
         }
-    };
-
-    dfs(dfs, BitManager::AllFalse(), 0, std::array<char, 8>());
+    }
 
     std::cout << ans;
+
+    return 0;
 }
