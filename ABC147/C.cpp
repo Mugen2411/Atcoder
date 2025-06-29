@@ -40,7 +40,7 @@ public:
      */
     static BitManager AllTrue()
     {
-        return BitManager(0xffffffffffffffffull);
+        return Filled(NUM_DIGIT);
     }
 
     /**
