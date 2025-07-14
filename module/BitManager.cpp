@@ -30,7 +30,7 @@ public:
      */
     static BitManager AllFalse()
     {
-        return BitManager(0ull);
+        return Filled(0);
     }
 
     /**
@@ -56,15 +56,17 @@ public:
     }
 
     /**
-        @brief	インデックス[0,idx)をtrueで埋め、それ以外がfalseのビットマネージャ
+        @brief	下からnum個のビットをtrueで埋め、それ以外がfalseのビットマネージャ
 
-        @param[in]	idx インデックス
+        @param[in]	num ビットを立てる個数
         @return 概要通りのビットマネージャ
      */
-    static BitManager Filled(int idx)
+    static BitManager Filled(int num)
     {
-        BitManager retval = AllFalse();
-        for (int i = 0; i < idx; ++i)
+        _ValidateBitNum(num);
+
+        BitManager retval = 0;
+        for (int i = 0; i < num; ++i)
         {
             retval.Set(i, true);
         }
@@ -227,11 +229,24 @@ private:
 
         @param[in]	idx インデックス
      */
-    void _ValidateIndex(int idx)
+    static void _ValidateIndex(int idx)
     {
-        if (idx >= NUM_DIGIT)
+        if (idx < 0 || NUM_DIGIT <= idx)
         {
             std::cerr << "BitManager: Index Error!" << std::endl;
+        }
+    }
+
+    /**
+        @brief	ビットの個数指定が正しいか検証する
+
+        @param[in]	num 個数
+     */
+    static void _ValidateBitNum(int num)
+    {
+        if (num < 0 || NUM_DIGIT < num)
+        {
+            std::cerr << "BitManager: Bit Num Error!" << std::endl;
         }
     }
 
