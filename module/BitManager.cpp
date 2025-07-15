@@ -1,8 +1,4 @@
-﻿#include <vector>
-#include <iostream>
-#include <array>
-
-#ifndef ___INCLUDED_BITMAN___
+﻿#ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
 #include <iostream>
@@ -13,6 +9,12 @@
 class BitManager
 {
 public:
+    /**
+        @brief	デフォルトコンストラクタ
+    */
+    BitManager()
+        : m_data(0ull) {};
+
     /**
         @brief	コンストラクタ
 
@@ -28,7 +30,7 @@ public:
      */
     static BitManager AllFalse()
     {
-        return BitManager(0ull);
+        return Filled(0);
     }
 
     /**
@@ -38,7 +40,7 @@ public:
      */
     static BitManager AllTrue()
     {
-        return BitManager(0xffffffffffffffffull);
+        return Filled(NUM_DIGIT);
     }
 
     /**
@@ -51,6 +53,37 @@ public:
     static BitManager Difference(const BitManager &lhs, const BitManager &rhs)
     {
         return BitManager(lhs.m_data ^ rhs.m_data);
+    }
+
+    /**
+        @brief	下からnum個のビットをtrueで埋め、それ以外がfalseのビットマネージャ
+
+        @param[in]	num ビットを立てる個数
+        @return 概要通りのビットマネージャ
+     */
+    static BitManager Filled(int num)
+    {
+        _ValidateBitNum(num);
+
+        BitManager retval = 0;
+        for (int i = 0; i < num; ++i)
+        {
+            retval.Set(i, true);
+        }
+        return retval;
+    }
+
+    /**
+        @brief	1つの要素だけtrue、他がfalseのビットマネージャ
+
+        @param[in]	idx trueにするインデックス
+        @return 概要を満たすビットマネージャ
+     */
+    static BitManager Onehot(int idx)
+    {
+        BitManager retval = AllFalse();
+        retval.Set(idx, true);
+        return retval;
     }
 
     /**
@@ -145,17 +178,75 @@ public:
         std::cerr << std::endl;
     }
 
+    /**
+        @brief	前置インクリメント演算子
+
+        @return 自身の参照
+     */
+    BitManager &operator++()
+    {
+        ++m_data;
+        return *this;
+    }
+
+    /**
+        @brief	後置インクリメント演算子
+
+        @return インクリメント前のコピー
+     */
+    BitManager operator++(int)
+    {
+        BitManager retval = *this;
+        operator++();
+        return retval;
+    }
+
+    /**
+        @brief	等価演算子
+
+        @param[in]	rhs 比較対象
+        @return 自身と右辺が等しいか
+     */
+    bool operator==(const BitManager &rhs)
+    {
+        return m_data == rhs.m_data;
+    }
+
+    /**
+        @brief	不等価演算子
+
+        @param[in]	rhs 比較対象
+        @return 自身と右辺が等しくないか
+     */
+    bool operator!=(const BitManager &rhs)
+    {
+        return !operator==(rhs);
+    }
+
 private:
     /**
         @brief	インデックスが正しいか検証する
 
         @param[in]	idx インデックス
      */
-    void _ValidateIndex(int idx)
+    static void _ValidateIndex(int idx)
     {
-        if (idx >= NUM_DIGIT)
+        if (idx < 0 || NUM_DIGIT <= idx)
         {
             std::cerr << "BitManager: Index Error!" << std::endl;
+        }
+    }
+
+    /**
+        @brief	ビットの個数指定が正しいか検証する
+
+        @param[in]	num 個数
+     */
+    static void _ValidateBitNum(int num)
+    {
+        if (num < 0 || NUM_DIGIT < num)
+        {
+            std::cerr << "BitManager: Bit Num Error!" << std::endl;
         }
     }
 
@@ -167,113 +258,3 @@ private:
 };
 
 #endif //___INCLUDED_BITMAN___
-
-int main()
-{
-    int N, M;
-    std::cin >> N >> M;
-
-    auto GetIdx = [N](int start, int goal)
-    {
-        int idx = start * N + goal;
-        if (idx >= 64)
-        {
-            std::cerr << "index error!" << std::endl;
-        }
-        return idx;
-    };
-    BitManager cur = BitManager::AllFalse();
-    while (M--)
-    {
-        int A, B;
-        std::cin >> A >> B;
-        --A, --B;
-        cur.Set(GetIdx(A, B), true);
-        cur.Set(GetIdx(B, A), true);
-    }
-
-    int ans = 0xff;
-    auto dfs = [&](auto self, BitManager curVal, int idx, std::array<char, 8> already)
-    {
-        // curVal.DebugOutput(curVal);
-        if (idx == N)
-        {
-            for (int i = 0; i < N; ++i)
-            {
-                if (already[i] != 2)
-                {
-                    return;
-                }
-            }
-            BitManager diff = BitManager::Difference(cur, curVal);
-            int tmp = diff.GetCount();
-
-            std::cerr << tmp << std::endl;
-            ans = std::min(ans, tmp / 2);
-            return;
-        }
-
-        if (already[idx] > 2)
-        {
-            std::cerr << "Logic Error!" << std::endl;
-            return;
-        }
-        if (already[idx] == 2)
-        {
-            self(self, curVal, idx + 1, already);
-        }
-        else if (already[idx] == 1)
-        {
-            for (int j = idx + 1; j < N; ++j)
-            {
-                if (!curVal.Get(GetIdx(idx, j)))
-                {
-                    if (already[j] >= 2)
-                    {
-                        continue;
-                    }
-                    BitManager newVal = curVal;
-                    newVal.Set(GetIdx(idx, j), true);
-                    newVal.Set(GetIdx(j, idx), true);
-
-                    std::array<char, 8> newAlready = already;
-                    ++newAlready[idx];
-                    ++newAlready[j];
-                    self(self, newVal, idx + 1, newAlready);
-                }
-            }
-        }
-        else
-        {
-            for (int i = idx + 1; i < N - 1; ++i)
-            {
-                if (already[i] >= 2)
-                {
-                    continue;
-                }
-                for (int j = i + 1; j < N; ++j)
-                {
-                    if (already[j] >= 2)
-                    {
-                        continue;
-                    }
-                    BitManager newVal = curVal;
-                    newVal.Set(GetIdx(idx, j), true);
-                    newVal.Set(GetIdx(j, idx), true);
-                    newVal.Set(GetIdx(idx, i), true);
-                    newVal.Set(GetIdx(i, idx), true);
-
-                    std::array<char, 8> newAlready = already;
-                    newAlready[idx] += 2;
-                    ++newAlready[j];
-                    ++newAlready[i];
-                    self(self, newVal, idx + 1, newAlready);
-                }
-            }
-        }
-    };
-
-    dfs(dfs, BitManager::AllFalse(), 0, std::array<char, 8>());
-
-    std::cout << ans;
-}
