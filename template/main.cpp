@@ -2,11 +2,7 @@
 #include <string>
 #include <sstream>
 
-#include <algorithm>
-#include <vector>
-#include <unordered_map>
-
-#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -21,52 +17,6 @@ private:
      */
     void Solve()
     {
-        int N;
-        In() >> N;
-        std::vector<int64_t> A(N);
-        std::unordered_map<int64_t, std::pair<int64_t, int64_t>> dict;
-        EachInput(A);
-        for (auto &a : A)
-        {
-            if (a < 0)
-            {
-                ++dict[std::abs(a)].first;
-            }
-            else
-            {
-                ++dict[std::abs(a)].second;
-            }
-        }
-
-        if (A.size() <= 2)
-        {
-            Yes();
-            return;
-        }
-        if (dict.size() == 1)
-        {
-            auto top = dict.begin();
-            YesNo((top->second.first) == 0 || (top->second.second) == 0 || std::abs((top->second.first) - (top->second.second)) <= 1);
-            return;
-        }
-        std::sort(A.begin(), A.end(), [](const int64_t &lhs, const int64_t &rhs)
-                  { return std::abs(lhs) < std::abs(rhs); });
-
-        bool isValid = true;
-        std::unordered_map<int64_t, int64_t> mult;
-        for (int i = 1; i < N - 1; ++i)
-        {
-            if (A[i - 1] * A[i + 1] != A[i] * A[i])
-            {
-                isValid = false;
-                break;
-            }
-            else
-            {
-                ++mult[A[i] * A[i]];
-            }
-        }
-        YesNo(isValid);
     }
 
     //----------- 以下編集の必要なし ----------------------
