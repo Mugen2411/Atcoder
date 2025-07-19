@@ -24,6 +24,16 @@ public:
         : m_data(val) {};
 
     /**
+        @brief	uint64_t型への変換を許可する
+
+        @return uint64_t型に変換されたデータ
+    */
+    operator uint64_t() const
+    {
+        return m_data;
+    }
+
+    /**
         @brief	全てfalseで初期化されたビットマネージャを取得
 
         @return 全てfalseで初期化されたビットマネージャ
@@ -256,5 +266,28 @@ public:
 private:
     uint64_t m_data; //!< 本体
 };
+
+namespace std
+{
+    /**
+        @brief	ビット管理クラスのハッシュ値を計算する
+
+        @tparam	 BitManagerを指定
+     */
+    template <>
+    struct hash<BitManager>
+    {
+        /**
+            @brief	呼び出し演算子
+
+            @param[in]	val 対象
+            @return ハッシュ値
+         */
+        size_t operator()(const BitManager &val) const
+        {
+            return std::hash<uint64_t>()(val);
+        }
+    };
+}
 
 #endif //___INCLUDED_BITMAN___

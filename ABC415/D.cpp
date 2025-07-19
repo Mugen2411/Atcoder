@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,38 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+
+        struct COLA
+        {
+            int64_t A;
+            int64_t cost;
+        };
+        std::vector<COLA> cola;
+        while (M--)
+        {
+            int64_t A, B;
+            In() >> A >> B;
+            COLA tmp = {A, B - A};
+            cola.push_back(tmp);
+        }
+        std::sort(cola.begin(), cola.end(), [](const COLA &lhs, const COLA &rhs)
+                  { return lhs.cost > rhs.cost; });
+
+        int64_t ans = 0;
+        int64_t cur = 0;
+        for (int i = 0; i < cola.size(); ++i)
+        {
+            if (cola[i].A <= N)
+            {
+                if (cur < cola[i].cost)
+                {
+                    cur = cola[i].cost;
+                }
+            }
+        }
+        std::cout << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

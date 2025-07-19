@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,38 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+
+        std::vector<int> indices;
+        for (int i = 0; i < S.size(); ++i)
+        {
+            if (S[i] == '#')
+            {
+                indices.push_back(i + 1);
+            }
+        }
+
+        bool isEndLine = false;
+        int i = 0;
+        while (1)
+        {
+            Out() << indices[i];
+            ++i;
+            if (i >= indices.size())
+            {
+                return;
+            }
+            if (isEndLine)
+            {
+                Out() << std::endl;
+            }
+            else
+            {
+                Out() << ',';
+            }
+            isEndLine = !isEndLine;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------
