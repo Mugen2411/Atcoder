@@ -2,6 +2,8 @@
 #include <string>
 #include <sstream>
 
+#include <vector>
+
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
@@ -17,6 +19,35 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+        std::string T = S;
+        struct AREA
+        {
+            int begin;
+            int last;
+        };
+        std::vector<AREA> A;
+        for (int i = 0; i < S.size(); ++i)
+        {
+            if (S[i] != '.')
+            {
+                continue;
+            }
+            if (i != 0 && S[i - 1] == '.')
+            {
+                A.back().last = i;
+            }
+            else
+            {
+                A.push_back({i, i});
+            }
+        }
+        for (auto &a : A)
+        {
+            T[a.begin] = 'o';
+        }
+        Out() << T;
     }
 
     //----------- 以下編集の必要なし ----------------------

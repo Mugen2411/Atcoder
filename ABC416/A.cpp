@@ -17,6 +17,21 @@ private:
      */
     void Solve()
     {
+        int N, L, R;
+        In() >> N >> L >> R;
+        --L;
+        std::string S;
+        In() >> S;
+
+        for (int i = L; i < R; ++i)
+        {
+            if (S[i] != 'o')
+            {
+                No();
+                return;
+            }
+        }
+        Yes();
     }
 
     //----------- 以下編集の必要なし ----------------------

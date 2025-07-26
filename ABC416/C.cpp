@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,39 @@ private:
      */
     void Solve()
     {
+        int N, K, X;
+        In() >> N >> K >> X;
+        std::vector<std::string> S(N);
+        EachInput(S);
+
+        std::vector<std::string> ans;
+
+        auto dfs = [&](auto self, std::vector<int> cur)
+        {
+            if (cur.size() == K)
+            {
+                std::string tmp;
+                for (int i = 0; i < cur.size(); ++i)
+                {
+                    tmp += S[cur[i]];
+                }
+                ans.push_back(tmp);
+                return;
+            }
+
+            for (int i = 0; i < N; ++i)
+            {
+                auto next = cur;
+                next.push_back(i);
+                self(self, next);
+            }
+        };
+
+        dfs(dfs, std::vector<int>());
+
+        std::sort(ans.begin(), ans.end());
+
+        Out() << ans[X - 1];
     }
 
     //----------- 以下編集の必要なし ----------------------

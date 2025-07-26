@@ -1,8 +1,10 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +19,29 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+        std::vector<int64_t> A(N), B(N);
+        EachInput(A);
+        EachInput(B);
+
+        for (auto &a : A)
+        {
+            a %= M;
+        }
+        for (auto &b : B)
+        {
+            b %= M;
+        }
+        std::sort(A.begin(), A.end());
+        std::sort(B.begin(), B.end());
+
+        int64_t ans = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            ans += (A[i] + B[i]) % M;
+        }
+        Out() << ans << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
