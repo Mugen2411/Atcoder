@@ -1,8 +1,9 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <algorithm>
+#include <unordered_set>
+#include <unordered_map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -21,46 +22,43 @@ private:
     {
         int64_t N;
         In() >> N;
-        std::vector<int64_t> L(N);
-        std::vector<int64_t> R(N);
-        std::vector<int64_t> orL(N);
-        std::vector<int64_t> orR(N);
-        for (int i = 0; i < N; ++i)
+        std::vector<int64_t> T(N);
+        std::vector<std::vector<int64_t>> graph(N);
+        for (int n = 0; n < N; ++n)
         {
-            In() >> L[i] >> R[i];
-            orL[i] = L[i];
-            orR[i] = R[i];
-            L[i] *= -1;
-        }
-        std::sort(L.begin(), L.end());
-        std::sort(R.begin(), R.end());
-
-        int64_t ans = 0;
-        for (int i = 0; i < N; ++i)
-        {
-            auto l = std::lower_bound(R.begin(), R.end(), orL[i]);
-            const int64_t lNum = [l, &R]() -> int64_t
+            In() >> T[n];
+            int64_t K;
+            In() >> K;
+            std::vector<int64_t> A(K);
+            EachInput(A);
+            for (auto &a : A)
             {
-                if (l == R.end())
-                {
-                    return 0;
-                }
-                return l - R.begin();
-            }();
-            auto r = std::lower_bound(L.begin(), L.end(), -orR[i]);
-            const int64_t rNum = [r, &L]() -> int64_t
-            {
-                if (r == L.end())
-                {
-                    return 0;
-                }
-                return r - L.begin();
-            }();
-
-            ans += N - lNum - rNum - 1;
+                graph[n].push_back(a - 1);
+            }
         }
 
-        Out() << ans / 2 << std::endl;
+        std::unordered_map<int64_t, int64_t> score;
+        auto dfs = [&](auto self, int cur) -> int64_t
+        {
+            if (score.count(cur) != 0)
+            {
+                return 0;
+            }
+            if (graph[cur].size() == 0)
+            {
+                return score[cur] = T[cur];
+            }
+            int64_t sum = 0;
+            for (auto &e : graph[cur])
+            {
+                sum += self(self, e);
+            }
+            return score[cur] = sum + T[cur];
+        };
+
+        dfs(dfs, N - 1);
+
+        Out() << score[N - 1] << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------

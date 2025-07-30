@@ -1,8 +1,6 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <sstream>
-#include <vector>
-#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -19,48 +17,6 @@ private:
      */
     void Solve()
     {
-        int64_t N;
-        In() >> N;
-        std::vector<int64_t> L(N);
-        std::vector<int64_t> R(N);
-        std::vector<int64_t> orL(N);
-        std::vector<int64_t> orR(N);
-        for (int i = 0; i < N; ++i)
-        {
-            In() >> L[i] >> R[i];
-            orL[i] = L[i];
-            orR[i] = R[i];
-            L[i] *= -1;
-        }
-        std::sort(L.begin(), L.end());
-        std::sort(R.begin(), R.end());
-
-        int64_t ans = 0;
-        for (int i = 0; i < N; ++i)
-        {
-            auto l = std::lower_bound(R.begin(), R.end(), orL[i]);
-            const int64_t lNum = [l, &R]() -> int64_t
-            {
-                if (l == R.end())
-                {
-                    return 0;
-                }
-                return l - R.begin();
-            }();
-            auto r = std::lower_bound(L.begin(), L.end(), -orR[i]);
-            const int64_t rNum = [r, &L]() -> int64_t
-            {
-                if (r == L.end())
-                {
-                    return 0;
-                }
-                return r - L.begin();
-            }();
-
-            ans += N - lNum - rNum - 1;
-        }
-
-        Out() << ans / 2 << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
