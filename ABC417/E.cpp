@@ -1,8 +1,12 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
+#include <unordered_set>
+#include <set>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,14 +21,56 @@ private:
      */
     void Solve()
     {
-        int N, A, B;
-        std::string S;
-        In() >> N >> A >> B >> S;
+        int64_t N, M, X, Y;
+        In() >> N >> M >> X >> Y;
+        --X, --Y;
 
-        for (int i = A; i < N - B; ++i)
+        std::vector<std::set<int64_t>> graph(N);
+
+        while (M--)
         {
-            Out() << S[i];
+            int64_t U, V;
+            In() >> U >> V;
+            --U, --V;
+            graph[U].insert(V);
+            graph[V].insert(U);
         }
+
+        std::vector<std::vector<int64_t>> ans;
+        std::vector<int64_t> searched(N);
+        auto dfs = [&](auto self, int64_t cur, std::vector<int64_t> route) -> void
+        {
+            if (!ans.empty())
+            {
+                return;
+            }
+            if (cur == Y)
+            {
+                route.push_back(cur);
+                ans.push_back(route);
+                return;
+            }
+            for (auto e : graph[cur])
+            {
+                if (searched[e] == 0)
+                {
+                    searched[e] = 1;
+                    auto next = route;
+                    next.push_back(cur);
+                    self(self, e, next);
+                }
+            }
+        };
+        searched[X] = 1;
+        dfs(dfs, X, std::vector<int64_t>());
+
+        // std::sort(ans.begin(), ans.end());
+
+        for (auto &rt : ans[0])
+        {
+            Out() << rt + 1 << " ";
+        }
+        Out() << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
