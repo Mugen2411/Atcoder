@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,34 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+        int64_t len = S.size();
+
+        long double ans = 0.0;
+
+        for (int begin = 0; begin < len - 2; ++begin)
+        {
+            for (int last = begin + 2; last < len; ++last)
+            {
+                if (S[begin] != 't' || S[last] != 't')
+                {
+                    continue;
+                }
+                int x = 0;
+                for (int i = begin + 1; i < last; ++i)
+                {
+                    if (S[i] == 't')
+                    {
+                        ++x;
+                    }
+                }
+                long double tmp = x / (long double)(last - begin - 1);
+                ans = std::max(ans, tmp);
+            }
+        }
+
+        Out() << std::fixed << std::setprecision(10) << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

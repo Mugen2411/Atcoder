@@ -1,8 +1,67 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+
+#ifndef ___INCLUDED_PREFIX_SUM___
+#define ___INCLUDED_PREFIX_SUM___
+
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <cassert>
+
+/**
+    @brief        累積和
+
+    @tparam     Iterator   範囲指定に使用するイテレータの型
+ */
+template <class Iterator>
+class PrefixSum
+{
+public:
+    using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
+
+    /**
+        @brief    コンストラクタ
+
+        @param[in]    rawData     元となるデータ
+    */
+    PrefixSum(Iterator beginItr, Iterator endItr)
+        : m_data()
+    {
+        int size = std::distance(beginItr, endItr);
+        m_data.resize(size + 1, 0);
+        int cur = 0;
+        for (decltype(beginItr) itr = beginItr; itr != endItr; itr = std::next(itr))
+        {
+            m_data[cur + 1] = m_data[cur] + *itr;
+            ++cur;
+        }
+    }
+
+    /**
+        @brief        累積和の取得
+
+        @param[in]    targetIdx   加算を終了するインデックス
+        @param[in]    offsetIdx   加算を開始するインデックス
+        @return                 累積和
+     */
+    T GetSum(size_t targetIdx, size_t offsetIdx)
+    {
+        assert(0 <= targetIdx && targetIdx < m_data.size());
+        assert(0 <= offsetIdx && offsetIdx < m_data.size());
+        return m_data[targetIdx] - m_data[offsetIdx];
+    }
+
+private:
+    std::vector<T> m_data; //!< データ構造
+};
+
+#endif //___INCLUDED_PREFIX_SUM___
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +76,40 @@ private:
      */
     void Solve()
     {
+        int64_t N, Q;
+        In() >> N >> Q;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+
+        std::sort(A.begin(), A.end());
+
+        auto mx = std::max_element(A.begin(), A.end());
+        std::vector<int64_t> amount(*mx + 1, 0);
+
+        for (int64_t i = 1; i < amount.size(); ++i)
+        {
+            amount[i] = amount[i - 1] + N - std::distance(A.begin(), std::lower_bound(A.begin(), A.end(), i));
+        }
+
+        while (Q--)
+        {
+            int64_t B;
+            In() >> B;
+
+            if (B == 1)
+            {
+                Out() << 1 << std::endl;
+                continue;
+            }
+
+            if (B >= amount.size())
+            {
+                Out() << -1 << std::endl;
+                continue;
+            }
+
+            Out() << amount[B - 1] + 1 << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

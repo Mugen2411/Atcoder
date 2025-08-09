@@ -17,6 +17,17 @@ private:
      */
     void Solve()
     {
+        int N;
+        std::string S;
+        In() >> N >> S;
+
+        if (N < 3)
+        {
+            No();
+            return;
+        }
+
+        YesNo(S[N - 3] == 't' && S[N - 2] == 'e' && S[N - 1] == 'a');
     }
 
     //----------- 以下編集の必要なし ----------------------
