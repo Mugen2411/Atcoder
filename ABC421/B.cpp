@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,21 @@ private:
      */
     void Solve()
     {
+        int64_t X;
+        int64_t Y;
+        In() >> X >> Y;
+
+        int64_t cur;
+
+        for (int i = 2; i < 10; ++i)
+        {
+            std::string revAns = std::to_string(X + Y);
+            std::reverse(revAns.begin(), revAns.end());
+            X = Y;
+            Y = std::stoll(revAns);
+        }
+
+        Out() << Y;
     }
 
     //----------- 以下編集の必要なし ----------------------

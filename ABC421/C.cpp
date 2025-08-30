@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,68 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+        std::string S;
+        In() >> S;
+
+        std::vector<int64_t> A;
+        std::vector<int64_t> B;
+
+        for (int i = 0; i < 2 * N; ++i)
+        {
+            if (S[i] == 'A')
+            {
+                A.push_back(i);
+            }
+            else
+            {
+                B.push_back(i);
+            }
+        }
+
+        auto Calc = [&](std::vector<int64_t> &a, std::vector<int64_t> &b)
+        {
+            int64_t retval = 0;
+            for (int i = 0; i < a.size(); ++i)
+            {
+                retval += std::abs(a[i] - b[i]);
+            }
+            return retval;
+        };
+
+        std::vector<int64_t> A2 = A;
+        std::vector<int64_t> B2 = B;
+
+        {
+            auto itr = std::remove_if(A2.begin(), A2.end(), [](const int64_t cur)
+                                      { return cur % 2 == 1; });
+            A2.erase(itr, A2.end());
+        }
+        {
+            auto itr = std::remove_if(B2.begin(), B2.end(), [](const int64_t cur)
+                                      { return cur % 2 == 0; });
+            B2.erase(itr, B2.end());
+        }
+
+        int64_t score1 = Calc(A2, B2);
+
+        std::vector<int64_t> A3 = A;
+        std::vector<int64_t> B3 = B;
+
+        {
+            auto itr = std::remove_if(A3.begin(), A3.end(), [](const int64_t cur)
+                                      { return cur % 2 == 0; });
+            A3.erase(itr, A3.end());
+        }
+        {
+            auto itr = std::remove_if(B3.begin(), B3.end(), [](const int64_t cur)
+                                      { return cur % 2 == 1; });
+            B3.erase(itr, B3.end());
+        }
+        int64_t score2 = Calc(A3, B3);
+
+        Out() << std::min(score1, score2);
     }
 
     //----------- 以下編集の必要なし ----------------------

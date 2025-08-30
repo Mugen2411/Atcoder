@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,15 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+        std::vector<std::string> S(N);
+        EachInput(S);
+        int X;
+        std::string Y;
+        In() >> X >> Y;
+
+        YesNo(S[X - 1] == Y);
     }
 
     //----------- 以下編集の必要なし ----------------------
