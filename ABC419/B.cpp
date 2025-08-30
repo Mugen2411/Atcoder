@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,37 @@ private:
      */
     void Solve()
     {
+        int Q;
+        In() >> Q;
+
+        std::map<int, int> mp;
+        while (Q--)
+        {
+            int cmd;
+            In() >> cmd;
+
+            switch (cmd)
+            {
+            case 1:
+            {
+                int x;
+                In() >> x;
+                ++mp[x];
+            }
+            break;
+            case 2:
+            {
+                auto &mini = *mp.begin();
+                Out() << mini.first << std::endl;
+                --mini.second;
+                if (mini.second == 0)
+                {
+                    mp.erase(mini.first);
+                }
+            }
+            break;
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

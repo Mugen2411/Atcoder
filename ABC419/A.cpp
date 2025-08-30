@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,22 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+
+        std::unordered_map<std::string, std::string> dict;
+        dict["red"] = "SSS";
+        dict["blue"] = "FFF";
+        dict["green"] = "MMM";
+
+        if (dict.count(S) != 0)
+        {
+            Out() << dict[S];
+        }
+        else
+        {
+            Out() << "Unknown";
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

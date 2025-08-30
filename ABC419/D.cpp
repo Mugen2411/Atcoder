@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,35 @@ private:
      */
     void Solve()
     {
+        int N, M;
+        In() >> N >> M;
+        std::string S, T;
+        In() >> S >> T;
+        std::vector<bool> isSwap(N + 1, false);
+        while (M--)
+        {
+            int L, R;
+            In() >> L >> R;
+            isSwap[L - 1] = !isSwap[L - 1];
+            isSwap[R] = !isSwap[R];
+        }
+
+        bool curPos = false;
+        for (int i = 0; i < N; ++i)
+        {
+            if (isSwap[i])
+            {
+                curPos = !curPos;
+            }
+            if (curPos)
+            {
+                Out() << T[i];
+            }
+            else
+            {
+                Out() << S[i];
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------
