@@ -2,8 +2,33 @@
 #include <string>
 #include <sstream>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
+#ifndef ___INCLUDED_BINARY_SEARCH___
+#define ___INCLUDED_BINARY_SEARCH___
+
+#include <cstdint>
+
+template <class F>
+int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
+{
+    int64_t mid;
+    while (std::abs(ng - ok) > 1)
+    {
+        mid = (ng + ok) / 2;
+        if (comp(mid))
+        {
+            ok = mid;
+        }
+        else
+        {
+            ng = mid;
+        }
+    }
+    return ok;
+}
+
+#endif //___INCLUDED_BINARY_SEARCH___
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
  */
@@ -17,6 +42,17 @@ private:
      */
     void Solve()
     {
+        int64_t numA, numB, numC;
+        In() >> numA >> numB >> numC;
+        int64_t ans = BinarySearch(1000000000000, -1, [&](int64_t cur)
+                                   {
+                                    int64_t curA = numA - cur;
+                                    int64_t curC = numC - cur;
+                                    if(curA < 0 || curC < 0){
+                                        return false;
+                                    }
+                                     return curA + numB + curC >= cur; });
+        Out() << ans << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------

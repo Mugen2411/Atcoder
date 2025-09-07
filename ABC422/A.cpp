@@ -17,6 +17,20 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+        int world = S[0] - '0';
+        int stage = S[2] - '0';
+
+        stage++;
+        if (stage > 8)
+        {
+            stage--;
+            stage %= 8;
+            stage++;
+            world++;
+        }
+        Out() << world << '-' << stage;
     }
 
     //----------- 以下編集の必要なし ----------------------

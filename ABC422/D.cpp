@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,38 @@ private:
      */
     void Solve()
     {
+        int64_t N, K;
+        In() >> N >> K;
+        std::vector<int64_t> U(N, 0);
+        std::vector<int64_t> B;
+
+        auto Func = [&](auto self, int64_t sum, int depth)
+        {
+            if (depth == N)
+            {
+                B.push_back(sum);
+                return;
+            }
+            if (sum % 2 == 1)
+            {
+                U[depth] = 1;
+                self(self, sum / 2, depth + 1);
+                self(self, sum / 2 + 1, depth + 1);
+            }
+            else
+            {
+                self(self, sum / 2, depth + 1);
+                self(self, sum / 2, depth + 1);
+            }
+        };
+
+        Func(Func, K, 0);
+
+        Out() << *std::max_element(U.begin(), U.end()) << std::endl;
+        for (auto b : B)
+        {
+            Out() << b << " ";
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------
