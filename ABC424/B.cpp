@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_set>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,30 @@ private:
      */
     void Solve()
     {
+        int N, M, K;
+        In() >> N >> M >> K;
+        std::vector<std::unordered_set<int>> result(N);
+        std::unordered_set<int> answered;
+        std::vector<int> ans;
+        while (K--)
+        {
+            int A, B;
+            In() >> A >> B;
+            --A, --B;
+            result[A].insert(B);
+            for (int i = 0; i < N; ++i)
+            {
+                if (result[i].size() == M && answered.count(i) == 0)
+                {
+                    ans.push_back(i);
+                    answered.insert(i);
+                }
+            }
+        }
+        for (auto a : ans)
+        {
+            Out() << a + 1 << " ";
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

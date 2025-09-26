@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_set>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,43 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+        std::unordered_set<int> learned;
+        std::vector<int> begins;
+        std::vector<std::vector<int>> tree(N);
+        int ans = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            int A, B;
+            In() >> A >> B;
+            if (A == 0 && B == 0)
+            {
+                begins.push_back(i);
+                continue;
+            }
+            tree[A - 1].push_back(i);
+            tree[B - 1].push_back(i);
+        }
+
+        auto dfs = [&](auto self, int cur) -> void
+        {
+            for (auto e : tree[cur])
+            {
+                if (learned.count(e) == 0)
+                {
+                    learned.insert(e);
+                    self(self, e);
+                }
+            }
+        };
+        for (auto b : begins)
+        {
+            learned.insert(b);
+            dfs(dfs, b);
+        }
+
+        Out() << learned.size() << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
