@@ -1,6 +1,9 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +20,49 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+
+        std::unordered_map<int64_t, int64_t> mp;
+        for (auto a : A)
+        {
+            ++mp[a];
+        }
+
+        std::unordered_set<int64_t> unused;
+        for (int i = 0; i < N; ++i)
+        {
+            unused.insert(i + 1);
+        }
+        for (auto m : mp)
+        {
+            if (m.first != -1)
+            {
+                if (m.second != 1)
+                {
+                    No();
+                    return;
+                }
+                unused.erase(m.first);
+            }
+        }
+
+        for (auto &a : A)
+        {
+            if (a == -1)
+            {
+                a = *unused.begin();
+                unused.erase(unused.begin());
+            }
+        }
+
+        Yes();
+        for (auto a : A)
+        {
+            Out() << a << " ";
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

@@ -1,8 +1,66 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+
+#ifndef ___INCLUDED_PREFIX_SUM___
+#define ___INCLUDED_PREFIX_SUM___
+
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <cassert>
+
+/**
+    @brief        累積和
+
+    @tparam     Iterator   範囲指定に使用するイテレータの型
+ */
+template <class Iterator>
+class PrefixSum
+{
+public:
+    using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
+
+    /**
+        @brief    コンストラクタ
+
+        @param[in]    rawData     元となるデータ
+    */
+    PrefixSum(Iterator beginItr, Iterator endItr)
+        : m_data()
+    {
+        int size = std::distance(beginItr, endItr);
+        m_data.resize(size + 1, 0);
+        int cur = 0;
+        for (decltype(beginItr) itr = beginItr; itr != endItr; itr = std::next(itr))
+        {
+            m_data[cur + 1] = m_data[cur] + *itr;
+            ++cur;
+        }
+    }
+
+    /**
+        @brief        累積和の取得
+
+        @param[in]    targetIdx   加算を終了するインデックス
+        @param[in]    offsetIdx   加算を開始するインデックス
+        @return                 累積和
+     */
+    T GetSum(size_t targetIdx, size_t offsetIdx)
+    {
+        assert(0 <= targetIdx && targetIdx < m_data.size());
+        assert(0 <= offsetIdx && offsetIdx < m_data.size());
+        return m_data[targetIdx] - m_data[offsetIdx];
+    }
+
+private:
+    std::vector<T> m_data; //!< データ構造
+};
+
+#endif //___INCLUDED_PREFIX_SUM___
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +75,50 @@ private:
      */
     void Solve()
     {
+        int N, Q;
+        In() >> N >> Q;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+        PrefixSum<decltype(A.begin())> ps(A.begin(), A.end());
+
+        int64_t top = 0;
+        while (Q--)
+        {
+            int cmd;
+            In() >> cmd;
+            switch (cmd)
+            {
+            case 1:
+            {
+                int c;
+                In() >> c;
+                top += c;
+                top %= N;
+            }
+            break;
+            case 2:
+            {
+                int l, r;
+                In() >> l >> r;
+                --l, --r;
+                int actL = (l + top) % N;
+                int actR = (r + top) % N;
+
+                if (actL <= actR)
+                {
+                    Out() << ps.GetSum(actR + 1, actL) << std::endl;
+                }
+                else
+                {
+                    Out() << ps.GetSum(actR + 1, 0) + ps.GetSum(N, actL) << std::endl;
+                }
+            }
+            break;
+
+            default:
+                break;
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

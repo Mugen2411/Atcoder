@@ -17,6 +17,21 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+        int64_t ans = 0;
+
+        for (int i = 1; i <= N; ++i)
+        {
+            int64_t lhs = -1;
+            for (int j = 1; j < i; ++j)
+            {
+                lhs *= -1;
+            }
+            int64_t rhs = i * i * i;
+            ans += lhs * rhs;
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------
