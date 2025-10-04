@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,14 @@ private:
      */
     void Solve()
     {
+        std::unordered_map<std::string, int> dict;
+        dict["Ocelot"] = 0;
+        dict["Serval"] = 1;
+        dict["Lynx"] = 2;
+
+        std::string X, Y;
+        In() >> X >> Y;
+        YesNo(dict[X] >= dict[Y]);
     }
 
     //----------- 以下編集の必要なし ----------------------

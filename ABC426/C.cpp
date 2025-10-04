@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,34 @@ private:
      */
     void Solve()
     {
+        int N, Q;
+        In() >> N >> Q;
+
+        std::map<int, int> cur;
+        for (int i = 0; i < N; ++i)
+        {
+            cur[-i] = 1;
+        }
+        while (Q--)
+        {
+            int X, Y;
+            In() >> X >> Y;
+            X--;
+            X *= -1;
+            Y--;
+            Y *= -1;
+
+            auto itr = cur.lower_bound(X);
+
+            int output = 0;
+            while (itr != cur.end())
+            {
+                output += itr->second;
+                itr = cur.erase(itr);
+            }
+            cur[Y] += output;
+            Out() << output << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +17,9 @@ private:
      */
     void Solve()
     {
+        int N;
+        std::string S;
+        In() >> N >> S;
     }
 
     //----------- 以下編集の必要なし ----------------------
