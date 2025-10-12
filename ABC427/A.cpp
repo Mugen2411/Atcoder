@@ -17,6 +17,16 @@ private:
      */
     void Solve()
     {
+        std::string S;
+        In() >> S;
+        for (int i = 0; i < S.size(); ++i)
+        {
+            if (i == S.size() / 2)
+            {
+                continue;
+            }
+            Out() << S[i];
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

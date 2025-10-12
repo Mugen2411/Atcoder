@@ -17,6 +17,22 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+
+        int A = 1;
+        for (int i = 1; i < N; ++i)
+        {
+            int cur = A;
+            int next = 0;
+            while (cur != 0)
+            {
+                next += cur % 10;
+                cur /= 10;
+            }
+            A += next;
+        }
+        Out() << A;
     }
 
     //----------- 以下編集の必要なし ----------------------
