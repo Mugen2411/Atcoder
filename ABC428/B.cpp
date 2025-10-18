@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,58 @@ private:
      */
     void Solve()
     {
+        int N, K;
+        std::string S;
+
+        In() >> N >> K >> S;
+
+        int ansCnt = 0;
+        std::vector<std::string> ans;
+
+        for (int begin = 0; begin <= N - K; ++begin)
+        {
+            std::string key;
+            for (int i = 0; i < K; ++i)
+            {
+                key.push_back(S[i + begin]);
+            }
+
+            int cnt = 0;
+            for (int b = 0; b <= N - K; ++b)
+            {
+                bool isAns = true;
+                for (int l = 0; l < K; ++l)
+                {
+                    if (S[b + l] != key[l])
+                    {
+                        isAns = false;
+                        break;
+                    }
+                }
+                if (isAns)
+                {
+                    ++cnt;
+                }
+            }
+            if (cnt > ansCnt)
+            {
+                ansCnt = cnt;
+                ans.clear();
+            }
+            if (cnt == ansCnt)
+            {
+                ans.push_back(key);
+            }
+        }
+
+        std::sort(ans.begin(), ans.end());
+        auto itr = std::unique(ans.begin(), ans.end());
+        ans.erase(itr, ans.end());
+        Out() << ansCnt << std::endl;
+        for (auto &s : ans)
+        {
+            Out() << s << " ";
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <stack>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,63 @@ private:
      */
     void Solve()
     {
+        int Q;
+        In() >> Q;
+
+        std::string S;
+        std::stack<int> st;
+        int numPair = 0;
+
+        while (Q--)
+        {
+            int cmd;
+            In() >> cmd;
+            switch (cmd)
+            {
+            case 1:
+            {
+                char c;
+                In() >> c;
+                S.push_back(c);
+
+                if (c == '(')
+                {
+                    st.push(c);
+                }
+                else
+                {
+                    if (!st.empty() && st.top() == '(')
+                    {
+                        st.pop();
+                        S.back() = ']';
+                    }
+                    else
+                    {
+                        st.push(c);
+                    }
+                }
+            }
+            break;
+            case 2:
+            {
+                if (S.back() == ']')
+                {
+                    st.push('(');
+                }
+                else
+                {
+                    st.pop();
+                }
+                S.pop_back();
+            }
+            break;
+
+            default:
+                break;
+            }
+
+            YesNo(st.empty());
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

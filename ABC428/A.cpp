@@ -17,6 +17,43 @@ private:
      */
     void Solve()
     {
+        int S, A, B, X;
+        In() >> S >> A >> B >> X;
+
+        int state = 0;
+        int time = 0;
+        int ans = 0;
+
+        for (int x = 0; x < X; ++x)
+        {
+            ++time;
+            switch (state)
+            {
+            case 0:
+            {
+                ans += S;
+                if (time == A)
+                {
+                    time = 0;
+                    state = 1;
+                }
+            }
+            break;
+            case 1:
+            {
+                if (time == B)
+                {
+                    time = 0;
+                    state = 0;
+                }
+            }
+            break;
+
+            default:
+                break;
+            }
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------
