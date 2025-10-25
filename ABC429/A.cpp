@@ -17,6 +17,20 @@ private:
      */
     void Solve()
     {
+        int N, M;
+        In() >> N >> M;
+
+        for (int i = 0; i < N; ++i)
+        {
+            if (i < M)
+            {
+                Out() << "OK" << std::endl;
+            }
+            else
+            {
+                Out() << "Too Many Requests" << std::endl;
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

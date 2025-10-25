@@ -1,8 +1,37 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <map>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+
+#ifndef ___INCLUDED_BINARY_SEARCH___
+#define ___INCLUDED_BINARY_SEARCH___
+
+#include <cstdint>
+
+template <class F>
+int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
+{
+    int64_t mid;
+    while (std::abs(ng - ok) > 1)
+    {
+        mid = (ng + ok) / 2;
+        if (comp(mid))
+        {
+            ok = mid;
+        }
+        else
+        {
+            ng = mid;
+        }
+    }
+    return ok;
+}
+
+#endif //___INCLUDED_BINARY_SEARCH___
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +46,57 @@ private:
      */
     void Solve()
     {
+        int64_t N, M, C;
+        In() >> N >> M >> C;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+
+        std::map<int64_t, int64_t> mp;
+        for (auto &a : A)
+        {
+            ++mp[a];
+        }
+        std::vector<int64_t> numList;
+        for (auto &m : mp)
+        {
+            numList.push_back(m.second);
+        }
+        for (auto &m : mp)
+        {
+            numList.push_back(m.second);
+        }
+        for (int i = 1; i < numList.size(); ++i)
+        {
+            numList[i] += numList[i - 1];
+        }
+        struct ELEM
+        {
+            int64_t Pos;
+            int64_t Num;
+        };
+        std::vector<ELEM> beg;
+        int64_t minP = 0;
+        for (auto &m : mp)
+        {
+            beg.push_back({m.first - minP, m.second});
+            minP = m.first;
+        }
+        beg[0].Pos += M - minP;
+        for (int i = 1; i < beg.size(); ++i)
+        {
+            beg[i].Num += beg[i - 1].Num;
+        }
+
+        int64_t ans = 0;
+
+        for (int i = 0; i < beg.size(); ++i)
+        {
+            int64_t idx = BinarySearch(-1, numList.size(), [&](int64_t cur)
+                                       { return numList[cur] - beg[i].Num >= C; });
+            ans += beg[i].Pos * (numList[idx] - beg[i].Num);
+        }
+
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

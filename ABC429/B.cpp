@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,28 @@ private:
      */
     void Solve()
     {
+        int N, M;
+        In() >> N >> M;
+        std::vector<int> A(N);
+        EachInput(A);
+
+        int sum = 0;
+        for (auto &i : A)
+        {
+            sum += i;
+        }
+
+        int diff = sum - M;
+        for (auto &i : A)
+        {
+            if (i == diff)
+            {
+                Yes();
+                return;
+            }
+        }
+        No();
+        return;
     }
 
     //----------- 以下編集の必要なし ----------------------
