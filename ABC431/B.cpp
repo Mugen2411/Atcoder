@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <set>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,31 @@ private:
      */
     void Solve()
     {
+        int X, N;
+        In() >> X >> N;
+        std::vector<int> W(N);
+        EachInput(W);
+
+        std::set<int> equip;
+        int Q;
+        In() >> Q;
+        while (Q--)
+        {
+            int P;
+            In() >> P;
+            --P;
+            if (equip.count(P))
+            {
+                equip.erase(P);
+                X -= W[P];
+            }
+            else
+            {
+                equip.insert(P);
+                X += W[P];
+            }
+            Out() << X << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

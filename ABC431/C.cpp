@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,57 @@ private:
      */
     void Solve()
     {
+        int N, M, K;
+        In() >> N >> M >> K;
+        std::vector<int64_t> H(N);
+        std::vector<int64_t> B(M);
+        EachInput(H);
+        EachInput(B);
+
+        std::map<int64_t, int64_t> He;
+        for (auto h : H)
+        {
+            ++He[h];
+        }
+        std::map<int64_t, int64_t> Be;
+        for (auto b : B)
+        {
+            ++Be[b];
+        }
+
+        int numAns = 0;
+
+        auto hI = He.begin();
+        auto bI = Be.begin();
+
+        while (1)
+        {
+            if (hI->first <= bI->first)
+            {
+                ++numAns;
+                hI->second--;
+                bI->second--;
+                if (hI->second == 0)
+                {
+                    hI = He.erase(hI);
+                }
+                if (bI->second == 0)
+                {
+                    bI = Be.erase(bI);
+                }
+            }
+            else
+            {
+                ++bI;
+            }
+
+            if (hI == He.end() || bI == Be.end() || numAns >= K)
+            {
+                break;
+            }
+        }
+
+        YesNo(numAns >= K);
     }
 
     //----------- 以下編集の必要なし ----------------------

@@ -1,8 +1,12 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
+#include <map>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define DP_SIZE 250010
+int64_t dp[510][DP_SIZE] = {0};
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +21,49 @@ private:
      */
     void Solve()
     {
+        int N;
+        In() >> N;
+
+        struct PARTS
+        {
+            int64_t W;
+            int64_t H;
+            int64_t B;
+            int64_t diff;     //!< 体から頭に移った時に増減する嬉しさ
+            long double cost; //!< この重さを頭に動かす効率
+        };
+
+        int64_t ans = 0;
+        int64_t init = 0;
+        int64_t buf = 0;
+        std::vector<PARTS> P;
+        for (int i = 0; i < N; ++i)
+        {
+            int64_t W, H, B;
+            In() >> W >> H >> B;
+            P.push_back({W, H, B, H - B, static_cast<long double>(H - B) / W});
+            buf += W;
+            init += B;
+        }
+
+        std::sort(P.begin(), P.end(), [](const PARTS &lhs, const PARTS &rhs)
+                  { return lhs.cost > rhs.cost; });
+
+        for (int i = 1; i <= N; ++i)
+        {
+            for (int w = 1; w < DP_SIZE; ++w)
+            {
+                if (w >= P[i - 1].W * 2)
+                {
+                    dp[i][w] = std::max(dp[i - 1][w], dp[i - 1][w - P[i - 1].W * 2] + P[i - 1].diff);
+                }
+                else
+                {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+        Out() << dp[N][buf] + init;
     }
 
     //----------- 以下編集の必要なし ----------------------
