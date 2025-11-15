@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,36 @@ private:
      */
     void Solve()
     {
+        int64_t X;
+        In() >> X;
+
+        std::unordered_map<int, int64_t> v;
+        while (X != 0)
+        {
+            ++v[X % 10];
+            ;
+            X /= 10;
+        }
+
+        if (v.count(0) != 0)
+        {
+            for (int i = 1; i <= 9; ++i)
+            {
+                if (v.count(i))
+                {
+                    --v[i];
+                    Out() << i;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < 10; ++i)
+        {
+            for (int j = 0; j < v[i]; ++j)
+            {
+                Out() << i;
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

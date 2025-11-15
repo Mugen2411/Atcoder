@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <unordered_set>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,37 @@ private:
      */
     void Solve()
     {
+        int64_t N, X, Y;
+        In() >> N >> X >> Y;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+
+        std::unordered_set<int64_t> md;
+        int64_t mini = 0xfffffffffffffff;
+        int64_t diff = Y - X;
+        for (int i = 0; i < N; ++i)
+        {
+            md.insert((Y * A[i]) % diff);
+            mini = std::min(mini, Y * A[i]);
+        }
+        if (md.size() != 1)
+        {
+            Out() << -1;
+            return;
+        }
+
+        int64_t ans = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            int64_t num = ((Y * A[i] - mini) / diff);
+            if (num > A[i])
+            {
+                Out() << -1;
+                return;
+            }
+            ans += A[i] - num;
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

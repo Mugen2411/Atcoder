@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <algorithm>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,11 @@ private:
      */
     void Solve()
     {
+        std::vector<int> i(3);
+        EachInput(i);
+
+        std::sort(i.begin(), i.end(), std::greater<int>());
+        Out() << i[0] << i[1] << i[2];
     }
 
     //----------- 以下編集の必要なし ----------------------
