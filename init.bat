@@ -5,6 +5,12 @@ setlocal enabledelayedexpansion
 rem ファイルパスを設定
 set folderName=%1
 
+rem ブランチ切ってチェックアウト
+git checkout master
+git pull origin master
+git branch %folderName%
+git checkout %folderName%
+
 set sourceName=template\main.cpp
 set fileNames[0]=A.cpp
 set fileNames[1]=B.cpp
