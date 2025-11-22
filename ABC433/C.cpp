@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,37 @@ private:
      */
     void Solve()
     {
+        struct COMP
+        {
+            int64_t value;
+            int64_t length;
+        };
+
+        std::string S;
+        In() >> S;
+
+        std::vector<COMP> comp;
+        for (auto c : S)
+        {
+            if (comp.empty() || comp.back().value != c)
+            {
+                comp.push_back({c, 1});
+            }
+            else
+            {
+                ++comp.back().length;
+            }
+        }
+
+        int64_t ans = 0;
+        for (int i = 0; i < comp.size() - 1; ++i)
+        {
+            if (comp[i + 1].value - comp[i].value == 1)
+            {
+                ans += std::min(comp[i + 1].length, comp[i].length);
+            }
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

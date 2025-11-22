@@ -1,9 +1,11 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <unordered_map>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
-
+#define MAX_DIGIT 15
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
  */
@@ -17,6 +19,42 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+        std::vector<std::string> A(N);
+        EachInput(A);
+
+        int64_t dig[MAX_DIGIT];
+        {
+            int64_t c = 1;
+            for (int i = 0; i < MAX_DIGIT; ++i)
+            {
+                c %= M;
+                dig[i] = c;
+                c *= 10;
+            }
+        }
+        std::unordered_map<int64_t, int64_t> modulo[MAX_DIGIT];
+        for (int i = 0; i < N; ++i)
+        {
+            int64_t val = std::stoll(A[i]);
+            for (int i = 0; i < MAX_DIGIT; ++i)
+            {
+                ++modulo[i][(val * dig[i]) % M];
+            }
+        }
+
+        int64_t ans = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            int64_t val = std::stoll(A[i]);
+            int64_t d = A[i].length();
+
+            int64_t myModulo = val % M;
+            ans += modulo[d][(M - myModulo) % M];
+        }
+
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------

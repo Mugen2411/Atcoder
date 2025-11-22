@@ -17,6 +17,21 @@ private:
      */
     void Solve()
     {
+        int X, Y, Z;
+        In() >> X >> Y >> Z;
+
+        for (int i = 0; i < 10000; ++i)
+        {
+            if (X == Y * Z)
+            {
+                Yes();
+                return;
+            }
+            ++X;
+            ++Y;
+        }
+        No();
+        return;
     }
 
     //----------- 以下編集の必要なし ----------------------
