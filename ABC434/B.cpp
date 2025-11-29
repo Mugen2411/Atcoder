@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <iomanip>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,24 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+        std::vector<int64_t> weight(M);
+        std::vector<int64_t> count(M);
+
+        while (N--)
+        {
+            int64_t t, w;
+            In() >> t >> w;
+            --t;
+            weight[t] += w;
+            ++count[t];
+        }
+
+        for (int i = 0; i < M; ++i)
+        {
+            Out() << std::fixed << std::setprecision(10) << static_cast<long double>(weight[i]) / count[i] << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

@@ -1,8 +1,9 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +18,34 @@ private:
      */
     void Solve()
     {
+        int64_t N, H;
+        In() >> N >> H;
+        std::vector<int64_t> t(N), l(N), u(N);
+
+        for (int i = 0; i < N; ++i)
+        {
+            In() >> t[i] >> l[i] >> u[i];
+        }
+
+        int64_t currentLow = H;
+        int64_t currentHi = H;
+        int64_t currentTime = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            int64_t duration = t[i] - currentTime;
+            int64_t movableLow = currentLow - duration;
+            int64_t movableHi = currentHi + duration;
+
+            if (movableLow > u[i] || movableHi < l[i])
+            {
+                No();
+                return;
+            }
+            currentLow = std::max(movableLow, l[i]);
+            currentHi = std::min(movableHi, u[i]);
+            currentTime = t[i];
+        }
+        Yes();
     }
 
     //----------- 以下編集の必要なし ----------------------
