@@ -33,6 +33,63 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
 
 #endif //___INCLUDED_BINARY_SEARCH___
 
+#ifndef ___INCLUDED_PREFIX_SUM___
+#define ___INCLUDED_PREFIX_SUM___
+
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <cassert>
+
+/**
+    @brief        累積和
+
+    @tparam     Iterator   範囲指定に使用するイテレータの型
+ */
+template <class Iterator>
+class PrefixSum
+{
+public:
+    using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
+
+    /**
+        @brief    コンストラクタ
+
+        @param[in]    rawData     元となるデータ
+    */
+    PrefixSum(Iterator beginItr, Iterator endItr)
+        : m_data()
+    {
+        int size = std::distance(beginItr, endItr);
+        m_data.resize(size + 1, 0);
+        int cur = 0;
+        for (decltype(beginItr) itr = beginItr; itr != endItr; itr = std::next(itr))
+        {
+            m_data[cur + 1] = m_data[cur] + *itr;
+            ++cur;
+        }
+    }
+
+    /**
+        @brief        累積和の取得
+
+        @param[in]    targetIdx   加算を終了するインデックス
+        @param[in]    offsetIdx   加算を開始するインデックス
+        @return                 累積和
+     */
+    T GetSum(size_t targetIdx, size_t offsetIdx)
+    {
+        assert(0 <= targetIdx && targetIdx < m_data.size());
+        assert(0 <= offsetIdx && offsetIdx < m_data.size());
+        return m_data[targetIdx] - m_data[offsetIdx];
+    }
+
+private:
+    std::vector<T> m_data; //!< データ構造
+};
+
+#endif //___INCLUDED_PREFIX_SUM___
+
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
  */
@@ -51,52 +108,32 @@ private:
         std::vector<int64_t> A(N);
         EachInput(A);
 
-        std::map<int64_t, int64_t> mp;
-        for (auto &a : A)
+        // 座標圧縮
+        std::vector<int64_t> pos = A;
+        std::sort(pos.begin(), pos.end());
         {
-            ++mp[a];
+            auto itr = std::unique(pos.begin(), pos.end());
+            pos.erase(itr, pos.end());
         }
-        std::vector<int64_t> numList;
-        for (auto &m : mp)
+        pos.push_back(M + pos.front());
+        std::vector<int64_t> numPerson(pos.size());
+        for (auto a : A)
         {
-            numList.push_back(m.second);
+            int64_t idx = std::lower_bound(pos.begin(), pos.end(), a) - pos.begin();
+            ++numPerson[idx];
         }
-        for (auto &m : mp)
-        {
-            numList.push_back(m.second);
-        }
-        for (int i = 1; i < numList.size(); ++i)
-        {
-            numList[i] += numList[i - 1];
-        }
-        struct ELEM
-        {
-            int64_t Pos;
-            int64_t Num;
-        };
-        std::vector<ELEM> beg;
-        int64_t minP = 0;
-        for (auto &m : mp)
-        {
-            beg.push_back({m.first - minP, m.second});
-            minP = m.first;
-        }
-        beg[0].Pos += M - minP;
-        for (int i = 1; i < beg.size(); ++i)
-        {
-            beg[i].Num += beg[i - 1].Num;
-        }
+        numPerson.insert(numPerson.end(), numPerson.begin(), numPerson.end());
+        PrefixSum<decltype(numPerson.begin())> pref(numPerson.begin(), numPerson.end());
 
-        int64_t ans = 0;
-
-        for (int i = 0; i < beg.size(); ++i)
+        int64_t sum = 0;
+        for (int i = 1; i < numPerson.size() / 2; ++i)
         {
-            int64_t idx = BinarySearch(-1, numList.size(), [&](int64_t cur)
-                                       { return numList[cur] - beg[i].Num >= C; });
-            ans += beg[i].Pos * (numList[idx] - beg[i].Num);
+            int64_t idx = BinarySearch(i - 1, numPerson.size(), [&](int64_t cur)
+                                       { return pref.GetSum(cur, i) >= C; });
+            int64_t dist = pos[i] - pos[i - 1];
+            sum += pref.GetSum(idx, i) * dist;
         }
-
-        Out() << ans;
+        Out() << sum;
     }
 
     //----------- 以下編集の必要なし ----------------------
