@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -20,6 +21,49 @@ private:
         int N;
         std::string S;
         In() >> N >> S;
+
+        struct ELEM
+        {
+            char c;
+            int64_t len;
+        };
+        std::vector<ELEM> comp;
+        for (auto c : S)
+        {
+            if (comp.empty() || comp.back().c != c)
+            {
+                comp.push_back({c, 1});
+            }
+            else
+            {
+                ++comp.back().len;
+            }
+        }
+        int64_t ans = N * 2;
+        for (char i = '0'; i <= '1'; ++i)
+        {
+            int64_t instaAns = 0;
+            auto base = comp.end();
+            int64_t longest = 0;
+            for (auto itr = comp.begin(); itr != comp.end(); ++itr)
+            {
+                if (longest < itr->len && itr->c == i)
+                {
+                    base = itr;
+                    longest = itr->len;
+                }
+            }
+            for (auto itr = comp.begin(); itr != comp.end(); ++itr)
+            {
+                if (itr == base)
+                {
+                    continue;
+                }
+                instaAns += itr->len * ((itr->c == i) ? 2 : 1);
+            }
+            ans = std::min(instaAns, ans);
+        }
+        Out() << ans << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
