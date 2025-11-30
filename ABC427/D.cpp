@@ -1,8 +1,10 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <unordered_set>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +19,79 @@ private:
      */
     void Solve()
     {
+        int64_t N, M, K;
+        In() >> N >> M >> K;
+
+        std::string S;
+        In() >> S;
+        std::vector<std::unordered_set<int64_t>> graph(N);
+
+        while (M--)
+        {
+            int64_t U, V;
+            In() >> U >> V;
+            --U, --V;
+            graph[U].insert(V);
+        }
+
+        std::vector<std::vector<bool>> dp(K * 2 + 1);
+        for (auto &d : dp)
+        {
+            d.resize(N, false);
+        }
+
+        // init
+        for (int i = 0; i < N; ++i)
+        {
+            dp[K * 2][i] = (S[i] == 'A'); // alice win = true
+        }
+
+        for (int turn = K * 2 - 1; turn >= 0; --turn)
+        {
+            if (turn % 2 == 0)
+            { // alice's turn
+                for (int i = 0; i < N; ++i)
+                {
+                    bool canAliceWin = false;
+                    for (auto &to : graph[i])
+                    {
+                        // can reach to win route by alice
+                        if (dp[turn + 1][to])
+                        {
+                            canAliceWin = true;
+                            break;
+                        }
+                    }
+                    dp[turn][i] = canAliceWin;
+                }
+            }
+            else
+            { // bob's turn
+                for (int i = 0; i < N; ++i)
+                {
+                    bool canAliceWin = true;
+                    for (auto &to : graph[i])
+                    {
+                        // can reach to lose route by bob
+                        if (!dp[turn + 1][to])
+                        {
+                            canAliceWin = false;
+                            break;
+                        }
+                    }
+                    dp[turn][i] = canAliceWin;
+                }
+            }
+        }
+
+        if (dp[0][0])
+        {
+            Out() << "Alice" << std::endl;
+        }
+        else
+        {
+            Out() << "Bob" << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------
