@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <unordered_map>
 
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
@@ -486,6 +487,7 @@ private:
         Grid2D<char> S(H, W, '\0');
         In() >> S;
 
+        // #が2x2で固まっていたら#、それ以外は.として圧縮する
         Grid2D<char> C(H - 1, W - 1, '\0');
         for (int y = 0; y < C.GetHeight(); ++y)
         {
@@ -502,57 +504,82 @@ private:
             }
         }
 
-        auto _GetX = [H](int idx)
+        BitManager beg = BitManager::AllFalse();
+        C.ForEach([&](int64_t idx, char val)
+                  {
+            if(val == '#'){
+                beg.Set(idx, true);
+            } });
+
+        std::unordered_map<BitManager, int64_t> curDP;
+        curDP[beg] = 0;
+
+        for (int y = 0; y < C.GetHeight(); ++y)
         {
-            return idx % (H - 2);
-        };
-        auto _GetY = [H](int idx)
-        {
-            return idx / (H - 2);
-        };
+            std::unordered_map<BitManager, int64_t> nextDP;
 
-        BitManager end = BitManager::Onehot((H - 2) * (W - 2));
-
-        int ans = H * W;
-
-        int dir[4][2] = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
-
-        for (BitManager cur = BitManager::AllFalse(); cur != end; ++cur)
-        {
-            Grid2D<char> tmp = C;
-            for (int i = 0; i < tmp.GetHeight() * tmp.GetWidth(); ++i)
+            for (auto &cur : curDP)
             {
-                if (cur.Get(i))
+                for (BitManager b = BitManager::AllFalse(); b != BitManager::Onehot(C.GetWidth()); ++b)
                 {
-                    for (auto d : dir)
+                    BitManager next = cur.first;
+                    for (int x = 0; x < C.GetWidth(); ++x)
                     {
-                        int nx = _GetX(i) + d[0];
-                        int ny = _GetY(i) + d[1];
-                        if (tmp.IsInner(nx, ny))
+                        if (!b.Get(x))
                         {
-                            tmp.Ref(nx, ny) = '.';
+                            continue;
+                        }
+                        // 1マス白塗りを置くことで圧縮後のマスから2x2範囲に.を置くのと同じ
+                        if (C.IsInner(x, y))
+                        {
+                            next.Set(C.GetIndex(x, y), false);
+                        }
+                        if (C.IsInner(x + 1, y))
+                        {
+                            next.Set(C.GetIndex(x + 1, y), false);
+                        }
+                        if (C.IsInner(x, y + 1))
+                        {
+                            next.Set(C.GetIndex(x, y + 1), false);
+                        }
+                        if (C.IsInner(x + 1, y + 1))
+                        {
+                            next.Set(C.GetIndex(x + 1, y + 1), false);
                         }
                     }
-                }
-            }
-            bool isAns = true;
-            for (int y = 0; y < tmp.GetHeight(); ++y)
-            {
-                for (int x = 0; x < tmp.GetWidth(); ++x)
-                {
-                    if (tmp.Ref(x, y) == '#')
+
+                    // y行目まで埋まってなければ不適
+                    bool canAns = true;
+                    for (int x = 0; x < C.GetWidth(); ++x)
                     {
-                        isAns = false;
+                        if (next.Get(C.GetIndex(x, y)))
+                        {
+                            canAns = false;
+                            break;
+                        }
+                    }
+                    if (!canAns)
+                    {
+                        continue;
+                    }
+
+                    // 新しい状態が生まれたらその手数を記録する。
+                    // 既にある状態に再びたどり着いたらより少ない手数でたどり着けた方を優先する
+                    if (nextDP.count(next))
+                    {
+                        nextDP[next] = std::min(nextDP[next], cur.second + b.GetCount());
+                    }
+                    else
+                    {
+                        nextDP[next] = cur.second + b.GetCount();
                     }
                 }
             }
-            if (isAns)
-            {
-                ans = std::min(ans, cur.GetCount());
-            }
+
+            curDP = nextDP;
         }
 
-        Out() << ans << std::endl;
+        Out() << curDP[BitManager::AllFalse()] << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
