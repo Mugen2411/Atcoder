@@ -41,21 +41,18 @@ private:
 
         auto convertDir = [](char dir)
         {
-            if (dir == 'R')
+            switch (dir)
             {
+            case 'R':
                 return 0;
-            }
-            if (dir == 'L')
-            {
+            case 'L':
                 return 1;
-            }
-            if (dir == 'U')
-            {
+            case 'U':
                 return 2;
-            }
-            if (dir == 'D')
-            {
+            case 'D':
                 return 3;
+            default:
+                return -1;
             }
         };
 
@@ -79,6 +76,11 @@ private:
         int64_t curTime = 0;
         int64_t ans = 0;
 
+        int64_t curR = curAR - curTR;
+        int64_t curC = curAC - curTC;
+        int64_t baseR = curR;
+        int64_t baseC = curC;
+
         while (curTime < N)
         {
             COMMAND &topT = cmdT.front();
@@ -100,72 +102,33 @@ private:
                 cmdA.pop_front();
             }
 
-            int64_t newTC = curTC + dir[curT.Direction].first * minDuration;
-            int64_t newTR = curTR + dir[curT.Direction].second * minDuration;
-            int64_t newAC = curAC + dir[curA.Direction].first * minDuration;
-            int64_t newAR = curAR + dir[curA.Direction].second * minDuration;
+            int64_t curDir[2] = {dir[curA.Direction].first - dir[curT.Direction].first,
+                                 dir[curA.Direction].second - dir[curT.Direction].second};
 
-            bool isTrl = (curT.Direction == 0 || curT.Direction == 1);
-            bool isArl = (curA.Direction == 0 || curA.Direction == 1);
+            int64_t nextR = curR + curDir[1] * minDuration;
+            int64_t nextC = curC + curDir[0] * minDuration;
 
-            if (curTC == curAC && curTR == curAR && curT.Duration == curA.Duration)
+            if (curDir[0] == 0 && curDir[1] == 0)
             {
-                ans += minDuration - 1; // first is already counted;
-            }
-            else if (curT.Direction == curA.Direction)
-            {
-                // No encounter;
-            }
-            else if (isTrl && !isArl)
-            {
-                int64_t begX = curTC;
-                int64_t endX = newTC;
-                if (begX > endX)
+                if (curR == 0 && curC == 0)
                 {
-                    std::swap(begX, endX);
-                }
-                if (begX <= curAC && curAC <= endX)
-                {
-                    ++ans; // encounter
-                }
-                if (newAC == curTC && curAC != curTC)
-                {
-                    ++ans;
+                    ans += minDuration;
                 }
             }
-            else if (!isTrl && isArl)
+            else if ((std::abs(curR) + std::abs(curC)) % 2 == 0)
             {
-                int64_t begX = curAC;
-                int64_t endX = newAC;
-                if (begX > endX)
+                int64_t halfMnDist = (std::abs(curR) + std::abs(curC)) / 2;
+                if (0 < halfMnDist && halfMnDist <= minDuration)
                 {
-                    std::swap(begX, endX);
-                }
-                if (begX < curTC && curTC < endX)
-                {
-                    ++ans; // encounter
-                }
-                if (newAC == curTC && curAC != curTC)
-                {
-                    ++ans;
-                }
-            }
-            else if ((curT.Direction & 1) && (curA.Direction & 1))
-            { // conflict
-                if (isTrl && (curTC - newTC) * (curAC - newAC) < 0 && curTR == curAR)
-                {
-                    ++ans;
-                }
-                else if (!isTrl && (curTR - newTR) * (curAR - newAR) < 0 && curTC == curAC)
-                {
-                    ++ans;
+                    if (curR + curDir[1] * halfMnDist == 0 && curC + curDir[0] * halfMnDist == 0)
+                    {
+                        ++ans;
+                    }
                 }
             }
 
-            curTC = newTC;
-            curTR = newTR;
-            curAC = newAC;
-            curAR = newAR;
+            curR = nextR;
+            curC = nextC;
 
             curTime += minDuration;
         }
