@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,61 @@ private:
      */
     void Solve()
     {
+        int64_t N;
+        In() >> N;
+        std::vector<int64_t> P(N);
+        std::vector<int64_t> A(N);
+        std::vector<int64_t> B(N);
+
+        for (int i = 0; i < N; ++i)
+        {
+            In() >> P[i] >> A[i] >> B[i];
+        }
+
+        constexpr int64_t MAX_BORDER = 500;
+        std::vector<int64_t[MAX_BORDER * 2 + 1]> dp(N);
+
+        for (int i = 0; i <= MAX_BORDER * 2; ++i)
+        {
+            dp[N - 1][i] = (i <= P[N - 1]) ? i + A[N - 1] : std::max<int64_t>(0ll, i - B[N - 1]);
+        }
+
+        for (int64_t n = N - 2; n >= 0; --n)
+        {
+            for (int64_t i = 0; i <= MAX_BORDER * 2; ++i)
+            {
+                dp[n][i] = (i <= P[n]) ? dp[n + 1][i + A[n]] : std::max<int64_t>(0ll, dp[n + 1][std::max<int64_t>(0ll, i - B[n])]);
+            }
+        }
+
+        std::vector<int64_t> over(N + 1);
+        over[0] = MAX_BORDER;
+        for (int i = 1; i <= N; ++i)
+        {
+            over[i] = over[i - 1] + B[i - 1];
+        }
+        std::vector<int64_t> negative(N + 1);
+        negative[0] = 0;
+        for (int i = 1; i <= N; ++i)
+        {
+            negative[i] = negative[i - 1] - B[i - 1];
+        }
+
+        int64_t Q;
+        In() >> Q;
+        while (Q--)
+        {
+            int64_t X;
+            In() >> X;
+            int64_t offset = std::lower_bound(over.begin(), over.end(), X) - over.begin();
+            if (offset >= N)
+            {
+                Out() << X + negative.back() << std::endl;
+                continue;
+            }
+            X += negative[offset];
+            Out() << dp[offset][X] << std::endl;
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------
