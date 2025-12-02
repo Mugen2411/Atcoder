@@ -25,23 +25,36 @@ private:
         EachInput(A);
         EachInput(B);
 
+        int64_t sum = 0;
         for (auto &a : A)
         {
-            a %= M;
+            sum += a;
         }
         for (auto &b : B)
         {
-            b %= M;
+            sum += b;
         }
-        std::sort(A.begin(), A.end());
+
+        std::sort(A.begin(), A.end(), std::greater<int64_t>());
         std::sort(B.begin(), B.end());
 
-        int64_t ans = 0;
-        for (int i = 0; i < N; ++i)
+        int64_t found = 0;
+        int64_t r = 0;
+        for (int64_t l = 0; l < N; ++l)
         {
-            ans += (A[i] + B[i]) % M;
+            while (r < N && B[r] + A[l] < M)
+            {
+                ++r;
+            }
+            if (r >= N)
+            {
+                break;
+            }
+            ++found;
+            ++r;
         }
-        Out() << ans << std::endl;
+
+        Out() << sum - found * M << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
