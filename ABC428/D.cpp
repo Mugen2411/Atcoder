@@ -1,8 +1,9 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <cmath>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -17,6 +18,54 @@ private:
      */
     void Solve()
     {
+        std::string Cs, Ds;
+        int64_t C, D;
+        In() >> Cs >> Ds;
+        C = std::stoll(Cs);
+        D = std::stoll(Ds);
+        std::string CDs = std::to_string(C + D);
+
+        auto _FloorSqrt = [](int64_t n)
+        {
+            int64_t ans = sqrt(n);
+            while (ans * ans > n)
+            {
+                --ans;
+            }
+            while ((ans + 1) * (ans + 1) <= n)
+            {
+                ++ans;
+            }
+            return ans;
+        };
+        int64_t mn = 1;
+        int64_t mx = 10;
+        int64_t lhs = C * 10;
+        for (int i = 1; i < Cs.size(); ++i)
+        {
+            lhs *= 10;
+            mn *= 10;
+            mx *= 10;
+        }
+
+        int64_t ans = 0;
+        for (int64_t i = 0; i < 12; ++i)
+        {
+            if (mn > C + D)
+            {
+                break;
+            }
+            int64_t l = std::max(C, mn - 1);
+            int64_t h = std::min(C + D, mx - 1);
+
+            ans += _FloorSqrt(lhs + h) - _FloorSqrt(lhs + l);
+
+            mn *= 10;
+            mx *= 10;
+            lhs *= 10;
+        }
+
+        Out() << ans << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
