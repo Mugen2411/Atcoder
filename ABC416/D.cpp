@@ -39,14 +39,11 @@ private:
         std::sort(B.begin(), B.end());
 
         int64_t found = 0;
-        int64_t r = 0;
+        auto r = B.begin();
         for (int64_t l = 0; l < N; ++l)
         {
-            while (r < N && B[r] + A[l] < M)
-            {
-                ++r;
-            }
-            if (r >= N)
+            r = std::lower_bound(r, B.end(), M - A[l]);
+            if (r == B.end())
             {
                 break;
             }
