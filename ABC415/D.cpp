@@ -32,11 +32,18 @@ private:
         {
             int64_t A, B;
             In() >> A >> B;
-            COLA tmp = {A, B - A};
+            COLA tmp = {A, A - B};
             cola.push_back(tmp);
         }
         std::sort(cola.begin(), cola.end(), [](const COLA &lhs, const COLA &rhs)
-                  { return lhs.cost > rhs.cost; });
+                  {
+                    if( lhs.cost < rhs.cost){
+                        return true;
+                    } 
+                    if(lhs.cost > rhs.cost){
+                        return false;
+                    }
+                    return lhs.A < rhs.A; });
 
         int64_t ans = 0;
         int64_t cur = 0;
@@ -44,10 +51,14 @@ private:
         {
             if (cola[i].A <= N)
             {
-                if (cur < cola[i].cost)
+                int64_t num = (N - cola[i].A) / cola[i].cost;
+                N -= num * cola[i].cost;
+                if (N >= cola[i].A)
                 {
-                    cur = cola[i].cost;
+                    ++num;
+                    N -= cola[i].cost;
                 }
+                ans += num;
             }
         }
         std::cout << ans;
