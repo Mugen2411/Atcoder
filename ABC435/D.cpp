@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <unordered_set>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +19,61 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+        std::vector<std::vector<int64_t>> graph(N);
+
+        while (M--)
+        {
+            int64_t X, Y;
+            In() >> X >> Y;
+            --X, --Y;
+            graph[Y].push_back(X);
+        }
+
+        std::vector<bool> isBlack(N, false);
+
+        int64_t Q;
+        In() >> Q;
+        while (Q--)
+        {
+            int64_t cmd, v;
+            In() >> cmd >> v;
+            --v;
+
+            switch (cmd)
+            {
+            case 1:
+            {
+                auto dfs = [&](auto self, int64_t cur)
+                {
+                    if (isBlack[cur])
+                    {
+                        return;
+                    }
+                    isBlack[cur] = true;
+                    for (auto &e : graph[cur])
+                    {
+                        if (!isBlack[e])
+                        {
+                            self(self, e);
+                        }
+                    }
+                };
+
+                dfs(dfs, v);
+            }
+
+            break;
+            case 2:
+            {
+                YesNo(isBlack[v]);
+            }
+
+            default:
+                break;
+            }
+        }
     }
 
     //----------- 以下編集の必要なし ----------------------

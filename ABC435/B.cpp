@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -17,6 +18,38 @@ private:
      */
     void Solve()
     {
+        int64_t N;
+        In() >> N;
+        std::vector<int64_t> A(N);
+        EachInput(A);
+
+        int64_t ans = 0;
+        for (int i = 0; i < N; ++i)
+        {
+            for (int j = i + 1; j <= N; ++j)
+            {
+                int64_t sum = 0;
+                for (int k = i; k < j; ++k)
+                {
+                    sum += A[k];
+                }
+                bool isAns = true;
+                for (int k = i; k < j; ++k)
+                {
+                    if (sum % A[k] == 0)
+                    {
+                        isAns = false;
+                        break;
+                    }
+                }
+                if (isAns)
+                {
+                    ++ans;
+                }
+            }
+        }
+
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------
