@@ -52,7 +52,7 @@ public:
     //! @return 含まれていたらtrue
     bool IsCovered(T left, T right)
     {
-        auto itr = _GetNearest(left);
+        auto itr = _GetNearest(left + 1);
         return itr->Left <= left && right <= itr->Right;
     }
 
@@ -62,7 +62,7 @@ public:
     //! @return 含まれていればその範囲、含まれていなければ{-INF, -INF}
     Range GetCoveredBy(T left, T right)
     {
-        auto itr = _GetNearest(left);
+        auto itr = _GetNearest(left + 1);
         if (itr->Left <= left && right <= itr->Right)
         {
             return *itr;
@@ -86,7 +86,7 @@ public:
         T newLeft = left;   // 追加する範囲の左端
         T newRight = right; // 追加する範囲の左端
 
-        auto itr = _GetNearest(left);
+        auto itr = _GetNearest(left + 1);
         // 近くにある区間の右側が新規範囲に被っているパターン
         if (itr->Left <= left && left <= itr->Right + 1)
         {
@@ -128,7 +128,7 @@ public:
     //! @return 削除したことにより減った要素数
     T Erase(T left, T right)
     {
-        auto itr = _GetNearest(left);
+        auto itr = _GetNearest(left + 1);
 
         // 完全に既存の範囲の内側
         if (IsCovered(left, right))
