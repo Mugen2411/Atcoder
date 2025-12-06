@@ -1,0 +1,8 @@
+BasedOnStyle: Microsoft
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakTemplateDeclarations: Yes
+ReflowComments: false
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterNamespace: true
