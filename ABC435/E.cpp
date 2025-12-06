@@ -1,9 +1,6 @@
 ﻿#include <iostream>
 #include <string>
 #include <sstream>
-#include <set>
-#include <algorithm>
-#include <cassert>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -33,10 +30,27 @@ public:
         {
             return Left < rhs.Left || !(Left < rhs.Left) && Right < rhs.Right;
         }
+
+        //! @brief 等価演算子
+        //! @param rhs 右辺
+        //! @return 自身 == rhsならtrue
+        bool operator==(const Range &rhs) const
+        {
+            return Left == rhs.Left && Right == rhs.Right;
+        }
+
+        //! @brief 不等価演算子
+        //! @param rhs 右辺
+        //! @return 自身 != rhsならtrue
+        bool operator!=(const Range &rhs) const
+        {
+            return !(operator==(rhs));
+        }
     };
 
 public:
-    static constexpr T INF = std::numeric_limits<T>::max() / 2; //!< 無限大
+    static const T INF;               //!< 無限大
+    static const Range INVALID_RANGE; //!< 無効区間
 
 public:
     //! @brief デフォルトコンストラクタ
@@ -53,7 +67,7 @@ public:
     bool IsCovered(T left, T right)
     {
         Range nearest = GetCoveredBy(left, right);
-        return nearest.Left <= left && right <= nearest.Right;
+        return nearest != INVALID_RANGE;
     }
 
     //! @brief 指定した範囲を含む範囲を取得
@@ -67,7 +81,7 @@ public:
         {
             return *itr;
         }
-        return Range{.Left = -INF, .Right = -INF};
+        return INVALID_RANGE;
     }
 
     //! @brief 区間を追加する
@@ -185,8 +199,8 @@ public:
 
 private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
-    //! @param pivot
-    //! @return
+    //! @param pivot 指定した点
+    //! @return 最も近い範囲を指すイテレータ
     typename std::set<Range>::iterator _GetNearest(T pivot)
     {
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
@@ -195,6 +209,12 @@ private:
 private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
+
+template <class T>
+const T RangeSet<T>::INF = std::numeric_limits<T>::max() / 2;
+
+template <class T>
+const typename RangeSet<T>::Range RangeSet<T>::INVALID_RANGE = {.Left = INF, .Right = INF};
 
 #endif //___RANGE_SET___
 
