@@ -43,8 +43,8 @@ public:
     //! @return 含まれていたらtrue
     bool IsCovered(T left, T right)
     {
-        auto itr = _GetNearest(left);
-        return itr->Left <= left && right <= itr->Right;
+        Range nearest = GetCoveredBy(left, right);
+        return nearest.Left <= left && right <= nearest.Right;
     }
 
     //! @brief 指定した範囲を含む範囲を取得
