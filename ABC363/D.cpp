@@ -1,33 +1,198 @@
+#include <algorithm>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 
-int main()
+// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+
+/**
+    @brief	Atcoderの解答を行うのに便利なクラス
+ */
+class AtcoderSolveHelper
 {
-    std::vector<size_t> possible(37);
-    possible[0] = 0;
-    possible[1] = 10;
-    possible[2] = 9;
-    for (int i = 2; i <= 18; ++i)
+  private:
+    //----------- 編集エリア -----------------------------
+    /**
+        @brief	実際に問題を解く関数
+        @note   マルチケースの場合はケースごとに呼ばれます
+     */
+    void Solve()
     {
-        possible[i * 2 - 1] = possible[i * 2 - 2] * 10;
-        possible[i * 2] = possible[i * 2 - 1];
-    }
-    for (int i = 1; i < possible.size(); ++i)
-    {
-        possible[i] += possible[i - 1];
-    }
-    size_t N;
-    std::cin >> N;
-    size_t digit = 0;
-    for (int i = 0; i <= 18; ++i)
-    {
-        if (N <= possible[i])
+        int64_t N;
+        In() >> N;
+
+        int64_t numDigit = 0;
+        int64_t digitLower = 1;
+        int64_t diff = 9;
+        for (int64_t i = 1; i < 100; ++i)
         {
-            digit = i;
-            break;
+            digitLower += diff;
+
+            if (digitLower >= N)
+            {
+                digitLower -= diff;
+                ++digitLower;
+                numDigit = i;
+                break;
+            }
+            if (i % 2 == 0)
+            {
+                diff *= 10;
+            }
+        }
+
+        int64_t order = N - digitLower;
+        std::vector<int64_t> digit;
+        if (order == 0)
+        {
+            for (int i = 0; i < numDigit / 2 + (numDigit % 2); ++i)
+            {
+                digit.push_back(0);
+            }
+        }
+        else
+        {
+            while (order != 0)
+            {
+                digit.push_back(order % 10);
+                order /= 10;
+            }
+            while (digit.size() < (numDigit / 2) + (numDigit % 2))
+            {
+                digit.push_back(0);
+            }
+        }
+        ++digit.back();
+
+        std::reverse(digit.begin(), digit.end());
+
+        for (auto &d : digit)
+        {
+            Out() << d;
+        }
+        if (numDigit % 2 == 1)
+        {
+            digit.pop_back();
+        }
+        std::reverse(digit.begin(), digit.end());
+        for (auto &d : digit)
+        {
+            Out() << d;
         }
     }
-    size_t order = possible[digit] - N;
-    std::vector<size_t> num(digit);
+
+    //----------- 以下編集の必要なし ----------------------
+
+  public:
+    /**
+        @brief	各種処理の起点になる窓口
+     */
+    void Run()
+    {
+        int64_t numTestCases = 1;
+#ifdef ENABLE_MULTICASE
+        In() >> numTestCases;
+#endif
+        while (numTestCases--)
+        {
+            Solve();
+        }
+
+        std::cout << Out().str();
+    }
+
+  private:
+    /**
+        @brief	対象とするコンテナの各要素に入力を受け取る
+
+        @tparam	TargetContainerType 対象とするコンテナの型
+        @param[in]	targetContainer 対象とするコンテナ
+     */
+    template <class TargetContainerType>
+    void EachInput(TargetContainerType &targetContainer)
+    {
+        for (auto &&target : targetContainer)
+        {
+            In() >> target;
+        }
+    }
+
+    /**
+        @brief	入力ストリームを取得
+
+        @return 入力ストリーム
+     */
+    std::istream &In()
+    {
+        return std::cin;
+    }
+
+    /**
+        @brief	出力ストリームを取得
+
+        @return 出力ストリーム
+     */
+    std::stringstream &Out()
+    {
+        return m_outStream;
+    }
+
+    /**
+        @brief	エラー出力ストリームを取得
+
+        @return エラー出力ストリーム
+     */
+    std::ostream &Error()
+    {
+        return std::cerr;
+    }
+
+    /**
+        @brief	Yesと1行出力する
+     */
+    void Yes()
+    {
+        Out() << "Yes" << std::endl;
+    }
+
+    /**
+        @brief	Noと1行出力する
+     */
+    void No()
+    {
+        Out() << "No" << std::endl;
+    }
+
+    /**
+        @brief	渡されたbool値に応じてYesかNoを出力する
+
+        @param[in]	isYes Yesを出力するかどうか
+     */
+    void YesNo(bool isYes)
+    {
+        if (isYes)
+        {
+            Yes();
+        }
+        else
+        {
+            No();
+        }
+    }
+
+  private:
+    std::stringstream m_outStream; //!< 出力を一時的に貯めておけるストリーム
+};
+
+/**
+    @brief	エントリポイント
+
+    @return ステータスコード(atcoderにおいては基本0)
+ */
+int main()
+{
+    AtcoderSolveHelper solver;
+    solver.Run();
     return 0;
 }
