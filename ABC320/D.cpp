@@ -1,8 +1,8 @@
-﻿#include <algorithm>
-#include <iostream>
-#include <set>
+﻿#include <iostream>
+#include <limits>
 #include <sstream>
 #include <string>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -19,48 +19,67 @@ class AtcoderSolveHelper
      */
     void Solve()
     {
-        int64_t M;
-        In() >> M;
-        std::string S[3];
-        In() >> S[0] >> S[1] >> S[2];
-
-        for (int i = 0; i < 3; ++i)
+        struct Coord
         {
-            S[i] += S[i];
-            S[i] += S[i];
-        }
+            int64_t x, y;
 
-        std::sort(std::begin(S), std::end(S));
-
-        int64_t ans = M * 1000;
-
-        do
-        {
-            for (int i = 0; i < 10; ++i)
+            bool operator==(const Coord &rhs) const
             {
-                int64_t s = 0;
-                for (int64_t t = 0; t < M * 4; ++t)
-                {
-                    if (S[s][t] - '0' == i)
-                    {
-                        ++s;
-                    }
-                    if (s == 3)
-                    {
-                        ans = std::min(ans, t);
-                        break;
-                    }
-                }
+                return x == rhs.x && y == rhs.y;
             }
-        } while (std::next_permutation(std::begin(S), std::end(S)));
+            bool operator!=(const Coord &rhs) const
+            {
+                return !(operator==(rhs));
+            }
+        };
+        const Coord INVALID = {std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max()};
 
-        if (ans == M * 1000)
+        struct Edge
         {
-            Out() << -1 << std::endl;
+            Coord dist;
+            int64_t to;
+        };
+
+        int64_t N, M;
+        In() >> N >> M;
+
+        std::vector<std::vector<Edge>> graph(N);
+        std::vector<Coord> absPos(N, INVALID);
+
+        while (M--)
+        {
+            int64_t A, B;
+            Coord d = INVALID;
+
+            In() >> A >> B >> d.x >> d.y;
+            --A, --B;
+            graph[A].push_back(Edge{d, B});
+            graph[B].push_back(Edge{Coord{-d.x, -d.y}, A});
         }
-        else
+
+        auto dfs = [&](auto self, int64_t cur, Coord curPos) {
+            if (absPos[cur] != INVALID)
+            {
+                return;
+            }
+            absPos[cur] = curPos;
+            for (auto &e : graph[cur])
+            {
+                self(self, e.to, Coord{curPos.x + e.dist.x, curPos.y + e.dist.y});
+            }
+        };
+        dfs(dfs, 0, Coord{0, 0});
+
+        for (auto &p : absPos)
         {
-            Out() << ans << std::endl;
+            if (p == INVALID)
+            {
+                Out() << "undecidable" << std::endl;
+            }
+            else
+            {
+                Out() << p.x << " " << p.y << std::endl;
+            }
         }
     }
 
