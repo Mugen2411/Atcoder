@@ -29,30 +29,44 @@ class AtcoderSolveHelper
             In() >> u >> v;
             --u, --v;
             graph[u].push_back(v);
+            graph[v].push_back(u);
         }
         int64_t MX = 1e10;
         std::vector<int64_t> cost(N, MX);
+        std::vector<bool> searched(N, false);
 
         auto dfs = [&](auto self, int64_t cur) -> int64_t {
+            if (cost[cur] != MX)
+            {
+                return cost[cur];
+            }
+            if (graph[cur].size() == 1)
+            {
+                return cost[cur] = 1;
+            }
+            searched[cur] = true;
             int64_t c = 1;
             for (auto &e : graph[cur])
             {
+                if (searched[e])
+                {
+                    continue;
+                }
                 c += self(self, e);
             }
-            return cost[cur] = std::min(cost[cur], c);
+            return cost[cur] = c;
         };
 
         dfs(dfs, 0);
 
-        int64_t ans = MX;
+        int64_t mx = 0;
+        int64_t sum = 0;
         for (auto &e : graph[0])
         {
-            ans = std::min(ans, cost[e]);
+            sum += cost[e];
+            mx = std::max(mx, cost[e]);
         }
-        if (graph[0].size() <= 1)
-        {
-            ans = 0;
-        }
+        int64_t ans = sum - mx;
 
         Out() << ans + 1;
     }
