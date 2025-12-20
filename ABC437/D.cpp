@@ -1,6 +1,8 @@
-﻿#include <iostream>
-#include <string>
+﻿#include <algorithm>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -9,7 +11,7 @@
  */
 class AtcoderSolveHelper
 {
-private:
+  private:
     //----------- 編集エリア -----------------------------
     /**
         @brief	実際に問題を解く関数
@@ -17,11 +19,52 @@ private:
      */
     void Solve()
     {
+        int64_t N, M;
+        In() >> N >> M;
+        const int64_t MOD = 998244353;
+
+        std::vector<int64_t> A(N);
+        std::vector<int64_t> B(M);
+        EachInput(A);
+        EachInput(B);
+        std::sort(A.begin(), A.end());
+        std::sort(B.begin(), B.end());
+
+        std::vector<int64_t> pres(N + 1, 0);
+        for (int i = 1; i <= N; ++i)
+        {
+            pres[i] = (pres[i - 1] + A[i - 1]) % MOD;
+        }
+
+        int64_t ans = 0;
+        for (auto &b : B)
+        {
+            auto itr = std::lower_bound(A.begin(), A.end(), b);
+            int64_t dist = std::distance(A.begin(), itr);
+
+            int64_t tmp = -b * (N - dist * 2);
+            tmp %= MOD;
+
+            tmp += pres[N] - pres[dist];
+            tmp %= MOD;
+
+            tmp -= pres[dist] - pres[0];
+            tmp %= MOD;
+
+            ans += tmp;
+            ans %= MOD;
+        }
+
+        if (ans < 0)
+        {
+            ans += MOD;
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------
 
-public:
+  public:
     /**
         @brief	各種処理の起点になる窓口
      */
@@ -39,7 +82,7 @@ public:
         std::cout << Out().str();
     }
 
-private:
+  private:
     /**
         @brief	対象とするコンテナの各要素に入力を受け取る
 
@@ -118,7 +161,7 @@ private:
         }
     }
 
-private:
+  private:
     std::stringstream m_outStream; //!< 出力を一時的に貯めておけるストリーム
 };
 

@@ -1,15 +1,17 @@
-﻿#include <iostream>
-#include <string>
+﻿#include <algorithm>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
  */
 class AtcoderSolveHelper
 {
-private:
+  private:
     //----------- 編集エリア -----------------------------
     /**
         @brief	実際に問題を解く関数
@@ -17,11 +19,43 @@ private:
      */
     void Solve()
     {
+        struct DEER
+        {
+            int64_t W, P;
+            int64_t adv;
+        };
+
+        int64_t N;
+        In() >> N;
+
+        int64_t sum = 0;
+        std::vector<DEER> d(N);
+        for (int i = 0; i < N; ++i)
+        {
+            In() >> d[i].W >> d[i].P;
+            d[i].adv = d[i].W + d[i].P;
+            sum += d[i].W;
+        }
+        std::sort(d.begin(), d.end(), [](const DEER &lhs, const DEER &rhs) { return lhs.adv > rhs.adv; });
+        int64_t ans = N;
+        for (int i = 0; i < N; ++i)
+        {
+            if (sum > 0)
+            {
+                sum -= d[i].adv;
+                --ans;
+            }
+            else
+            {
+                break;
+            }
+        }
+        Out() << ans << std::endl;
     }
 
     //----------- 以下編集の必要なし ----------------------
 
-public:
+  public:
     /**
         @brief	各種処理の起点になる窓口
      */
@@ -39,7 +73,7 @@ public:
         std::cout << Out().str();
     }
 
-private:
+  private:
     /**
         @brief	対象とするコンテナの各要素に入力を受け取る
 
@@ -118,7 +152,7 @@ private:
         }
     }
 
-private:
+  private:
     std::stringstream m_outStream; //!< 出力を一時的に貯めておけるストリーム
 };
 

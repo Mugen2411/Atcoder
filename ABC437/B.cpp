@@ -1,6 +1,8 @@
 ﻿#include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
+
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -9,7 +11,7 @@
  */
 class AtcoderSolveHelper
 {
-private:
+  private:
     //----------- 編集エリア -----------------------------
     /**
         @brief	実際に問題を解く関数
@@ -17,11 +19,39 @@ private:
      */
     void Solve()
     {
+        int64_t H, W, N;
+        In() >> H >> W >> N;
+        std::vector<std::vector<int64_t>> A(H);
+        for (int i = 0; i < H; ++i)
+        {
+            A[i].resize(W);
+            EachInput(A[i]);
+        }
+        std::vector<int64_t> B(N);
+        EachInput(B);
+        int64_t ans = 0;
+        for (int y = 0; y < H; ++y)
+        {
+            int64_t tmp = 0;
+            for (int x = 0; x < W; ++x)
+            {
+                for (auto &b : B)
+                {
+                    if (A[y][x] == b)
+                    {
+                        ++tmp;
+                        break;
+                    }
+                }
+            }
+            ans = std::max(ans, tmp);
+        }
+        Out() << ans;
     }
 
     //----------- 以下編集の必要なし ----------------------
 
-public:
+  public:
     /**
         @brief	各種処理の起点になる窓口
      */
@@ -39,7 +69,7 @@ public:
         std::cout << Out().str();
     }
 
-private:
+  private:
     /**
         @brief	対象とするコンテナの各要素に入力を受け取る
 
@@ -118,7 +148,7 @@ private:
         }
     }
 
-private:
+  private:
     std::stringstream m_outStream; //!< 出力を一時的に貯めておけるストリーム
 };
 
