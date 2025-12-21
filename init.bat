@@ -7,13 +7,13 @@ set folderName=%1
 set generateName="gen_main.cpp"
 
 rem ブランチ切ってチェックアウト
-rem git checkout master
-rem git pull origin master
-rem git branch %folderName%
-rem git checkout %folderName%
+git checkout master
+git pull origin master
+git branch %folderName%
+git checkout %folderName%
 
 rem テンプレートファイルを生成
-GenerateTemplate.bat %generateName%
+call GenerateTemplate.bat %generateName%
 
 rem 作成するファイル名たちを指定
 set fileNames[0]=A.cpp
@@ -36,7 +36,7 @@ if defined cur (
 )
 
 rem 後始末
-rem del %generateName%
+del %generateName%
 
 @echo on
 popd
