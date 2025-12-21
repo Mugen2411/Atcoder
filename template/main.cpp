@@ -1,6 +1,9 @@
-﻿#include <iostream>
-#include <string>
+﻿#ifndef ___INCLUDED_MAIN___
+#define ___INCLUDED_MAIN___
+
+#include <iostream>
 #include <sstream>
+#include <string>
 
 // #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
@@ -9,19 +12,17 @@
  */
 class AtcoderSolveHelper
 {
-private:
+  private:
     //----------- 編集エリア -----------------------------
     /**
         @brief	実際に問題を解く関数
         @note   マルチケースの場合はケースごとに呼ばれます
      */
-    void Solve()
-    {
-    }
+    void Solve();
 
     //----------- 以下編集の必要なし ----------------------
 
-public:
+  public:
     /**
         @brief	各種処理の起点になる窓口
      */
@@ -39,7 +40,7 @@ public:
         std::cout << Out().str();
     }
 
-private:
+  private:
     /**
         @brief	対象とするコンテナの各要素に入力を受け取る
 
@@ -118,7 +119,7 @@ private:
         }
     }
 
-private:
+  private:
     std::stringstream m_outStream; //!< 出力を一時的に貯めておけるストリーム
 };
 
@@ -133,3 +134,13 @@ int main()
     solver.Run();
     return 0;
 }
+
+//----------------------編集スペースここから--------------------------
+
+void AtcoderSolveHelper::Solve()
+{
+}
+
+//----------------------編集スペースここまで--------------------------
+
+#endif //___INCLUDED_MAIN___
