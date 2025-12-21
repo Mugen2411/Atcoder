@@ -1,6 +1,7 @@
 ﻿#ifndef ___INCLUDED_BINARY_SEARCH___
 #define ___INCLUDED_BINARY_SEARCH___
 
+#include <cmath>
 #include <cstdint>
 
 template <class F>

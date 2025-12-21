@@ -1,10 +1,11 @@
 ﻿#ifndef ___INCLUDED_PREFIX_SUM___
 #define ___INCLUDED_PREFIX_SUM___
 
-#include <vector>
 #include <algorithm>
-#include <iterator>
 #include <cassert>
+#include <iterator>
+#include <vector>
+
 
 /**
     @brief        累積和
@@ -14,7 +15,7 @@
 template <class Iterator>
 class PrefixSum
 {
-public:
+  public:
     using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
 
     /**
@@ -22,8 +23,7 @@ public:
 
         @param[in]    rawData     元となるデータ
     */
-    PrefixSum(Iterator beginItr, Iterator endItr)
-        : m_data()
+    PrefixSum(Iterator beginItr, Iterator endItr) : m_data()
     {
         int size = std::distance(beginItr, endItr);
         m_data.resize(size + 1, 0);
@@ -49,7 +49,7 @@ public:
         return m_data[targetIdx] - m_data[offsetIdx];
     }
 
-private:
+  private:
     std::vector<T> m_data; //!< データ構造
 };
 

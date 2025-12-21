@@ -1,23 +1,22 @@
 ﻿#ifndef ___INCLUDED_FRACTION___
 #define ___INCLUDED_FRACTION___
 
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 
 /**
     @brief	    分数クラス
  */
 class Fraction
 {
-public:
+  public:
     /**
         @brief	コンストラクタ
 
         @param[in]	numerator       分子
         @param[in]	denominator     分母
     */
-    Fraction(int64_t numerator, int64_t denominator)
-        : m_denominator(denominator), m_numerator(numerator)
+    Fraction(int64_t numerator, int64_t denominator) : m_denominator(denominator), m_numerator(numerator)
     {
         _Reduce();
     }
@@ -27,8 +26,7 @@ public:
 
         @param[in]	intValue       整数値
     */
-    Fraction(int64_t intValue)
-        : m_denominator(1), m_numerator(intValue)
+    Fraction(int64_t intValue) : m_denominator(1), m_numerator(intValue)
     {
     }
 
@@ -37,8 +35,7 @@ public:
 
         @param[in]  rhs     右辺
      */
-    Fraction(const Fraction &rhs)
-        : m_denominator(rhs.m_denominator), m_numerator(rhs.m_numerator)
+    Fraction(const Fraction &rhs) : m_denominator(rhs.m_denominator), m_numerator(rhs.m_numerator)
     {
     }
 
@@ -66,6 +63,7 @@ public:
     {
         m_denominator = 1;
         m_numerator = intValue;
+        return *this;
     }
 
     /**
@@ -78,8 +76,7 @@ public:
      */
     bool operator==(const Fraction &rhs) const
     {
-        return m_denominator == rhs.m_denominator &&
-               m_numerator == rhs.m_numerator;
+        return m_denominator == rhs.m_denominator && m_numerator == rhs.m_numerator;
     }
 
     /**
@@ -207,7 +204,7 @@ public:
         return *this;
     }
 
-private:
+  private:
     /**
         @brief	    最大公約数を求める
 
@@ -268,7 +265,7 @@ private:
         m_denominator /= gcd;
     }
 
-private:
+  private:
     int64_t m_denominator; //!< 分母
     int64_t m_numerator;   //!< 分子
 };

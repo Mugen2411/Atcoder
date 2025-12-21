@@ -1,17 +1,24 @@
+echo off
 pushd %~dp0
 setlocal enabledelayedexpansion
 
 chcp 65001
 set MODULE_DIR=module
+set TARGET_NAME=%1
 
-for %%F in ("%MODULE_DIR%/*.cpp") do (
-    for /f "delims=" %%S in (%MODULE_DIR%/%%F) do (
-        echo %%S
-    )
-    echo;
+if exist %TARGET_NAME% del %TARGET_NAME%
+
+for %%F in ("%MODULE_DIR%\*.cpp") do (
+    echo "%%F"
+    cmd /u /c type "%%F" > $$$
+    cmd /c type $$$ >> "%1"
+    del $$$
+    echo; >> "%1"
 )
-for /f "delims=" %%S in (template/main.cpp) do (
-        echo %%S
-    )
 
+cmd /u /c type "template\main.cpp" > $$$
+cmd /c type $$$ >> %1
+del $$$
+
+endlocal
 popd
