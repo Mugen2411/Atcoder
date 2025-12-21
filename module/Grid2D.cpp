@@ -1,10 +1,11 @@
 ﻿#ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
-#include <vector>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <vector>
+
 
 /**
     @brief    二次元のグリッドを表すクラス
@@ -14,7 +15,7 @@
 template <class T>
 class Grid2D
 {
-public:
+  public:
     /**
         @brief    コンストラクタ
 
@@ -133,7 +134,7 @@ public:
         }
     }
 
-private:
+  private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
     int64_t m_height;      //!< 高さ

@@ -8,20 +8,18 @@
  */
 class BitManager
 {
-public:
+  public:
     /**
         @brief	デフォルトコンストラクタ
     */
-    BitManager()
-        : m_data(0ull) {};
+    BitManager() : m_data(0ull) {};
 
     /**
         @brief	コンストラクタ
 
         @param[in]	val 初期値
      */
-    BitManager(uint64_t val)
-        : m_data(val) {};
+    BitManager(uint64_t val) : m_data(val) {};
 
     /**
         @brief	uint64_t型への変換を許可する
@@ -101,8 +99,7 @@ public:
 
         @param[in]	rhs コピー元
      */
-    BitManager(const BitManager &rhs)
-        : m_data(rhs.m_data)
+    BitManager(const BitManager &rhs) : m_data(rhs.m_data)
     {
     }
 
@@ -233,7 +230,7 @@ public:
         return !operator==(rhs);
     }
 
-private:
+  private:
     /**
         @brief	インデックスが正しいか検証する
 
@@ -260,34 +257,34 @@ private:
         }
     }
 
-public:
+  public:
     static constexpr int NUM_DIGIT = 64; //!< 桁数
 
-private:
+  private:
     uint64_t m_data; //!< 本体
 };
 
 namespace std
 {
-    /**
+/**
         @brief	ビット管理クラスのハッシュ値を計算する
 
         @tparam	 BitManagerを指定
      */
-    template <>
-    struct hash<BitManager>
-    {
-        /**
+template <>
+struct hash<BitManager>
+{
+    /**
             @brief	呼び出し演算子
 
             @param[in]	val 対象
             @return ハッシュ値
          */
-        size_t operator()(const BitManager &val) const
-        {
-            return std::hash<uint64_t>()(val);
-        }
-    };
-}
+    size_t operator()(const BitManager &val) const
+    {
+        return std::hash<uint64_t>()(val);
+    }
+};
+} // namespace std
 
 #endif //___INCLUDED_BITMAN___

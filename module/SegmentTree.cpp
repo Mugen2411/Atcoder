@@ -1,10 +1,10 @@
 ﻿#ifndef ___INCLUDED_SEGMENT_TREE___
 #define ___INCLUDED_SEGMENT_TREE___
 
-#include <vector>
-#include <limits>
 #include <cstdint>
 #include <functional>
+#include <limits>
+#include <vector>
 
 /**
     @brief            セグメント木
@@ -14,7 +14,7 @@
 template <class T>
 class SegmentTree
 {
-public:
+  public:
     using MergeFuncType = std::function<T(T, T)>; //!< 比較関数の型
 
     /**
@@ -47,8 +47,9 @@ public:
         m_data[position] = value;
         while (position > 0)
         {
-            position = (position - 1) / 2;                                                      // 1つ親に移動
-            m_data[position] = m_mergeFunc(m_data[position * 2 + 1], m_data[position * 2 + 2]); // 2つの子を比較してFuncな方を選ぶ
+            position = (position - 1) / 2; // 1つ親に移動
+            m_data[position] =
+                m_mergeFunc(m_data[position * 2 + 1], m_data[position * 2 + 2]); // 2つの子を比較してFuncな方を選ぶ
         }
     }
 
@@ -123,7 +124,8 @@ public:
         @return     valueよりFuncな最も右のインデックス
      */
     template <class Condition>
-    size_t FindRightImpl(size_t queryL, size_t queryR, Condition cond, size_t currentIdx, size_t rangeBegins, size_t rangeEnds)
+    size_t FindRightImpl(size_t queryL, size_t queryR, Condition cond, size_t currentIdx, size_t rangeBegins,
+                         size_t rangeEnds)
     {
         // 自分の値が自分よりFuncであるor範囲外なら不正値を返す
         if (!cond(m_data[currentIdx]) || rangeEnds <= queryL || queryR <= rangeBegins)
@@ -175,7 +177,8 @@ public:
         @return     valueよりFuncな最も左のインデックス
      */
     template <class Condition>
-    size_t FindLeftImpl(size_t queryL, size_t queryR, Condition cond, size_t currentIdx, size_t rangeBegins, size_t rangeEnds)
+    size_t FindLeftImpl(size_t queryL, size_t queryR, Condition cond, size_t currentIdx, size_t rangeBegins,
+                        size_t rangeEnds)
     {
         // 自分の値が自分よりFuncであるor範囲外なら不正値を返す
         if (!cond(m_data[currentIdx]) || rangeEnds <= queryL || queryR <= rangeBegins)
@@ -190,7 +193,8 @@ public:
         }
 
         // 自分より左を見る
-        size_t idxL = FindLeftImpl(queryL, queryR, cond, currentIdx * 2 + 1, rangeBegins, (rangeBegins + rangeEnds) / 2);
+        size_t idxL =
+            FindLeftImpl(queryL, queryR, cond, currentIdx * 2 + 1, rangeBegins, (rangeBegins + rangeEnds) / 2);
         // 左にあったら返す
         if (idxL != INVALID)
         {
@@ -200,14 +204,17 @@ public:
         return FindLeftImpl(queryL, queryR, cond, currentIdx * 2 + 2, (rangeBegins + rangeEnds) / 2, rangeEnds);
     }
 
-private:
+  private:
     std::vector<T> m_data;     //!< 管理されるデータ本体
     size_t m_size;             //!< 管理部分を除いた本体のサイズ
     const T LIMIT_VALUE;       //!< 単位元
     MergeFuncType m_mergeFunc; //!< 比較関数
 
-public:
-    inline static constexpr size_t INVALID = std::numeric_limits<size_t>::max(); //!< 不正を示す定数
+  public:
+    static const size_t INVALID; //!< 不正を示す定数
 };
+
+template <class T>
+const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
 
 #endif //___INCLUDED_SEGMENT_TREE___

@@ -1,23 +1,23 @@
 ﻿#ifndef ___INCLUDED_UNIONFIND___
 #define ___INCLUDED_UNIONFIND___
 
-#include <vector>
 #include <cstddef>
 #include <cstdint>
+#include <vector>
+
 
 /**
     @brief        UnionFind
  */
 class UnionFind final
 {
-public:
+  public:
     /**
         @brief       コンストラクタ
 
         @param[in]   size        要素数
      */
-    UnionFind(size_t size)
-        : m_data(size, NO_PARENT), m_size(size, 1)
+    UnionFind(size_t size) : m_data(size, NO_PARENT), m_size(size, 1)
     {
     }
 
@@ -89,7 +89,7 @@ public:
         return parentL == parentR;
     }
 
-private:
+  private:
     const int64_t NO_PARENT = -1; //!< 親がいない(=自分が親)であることを示す定数
     std::vector<int64_t> m_data;  //!< 本体となる配列
     std::vector<int64_t> m_size;  //!< 木のサイズ
