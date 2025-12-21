@@ -8,6 +8,8 @@ set TARGET_NAME=%1
 
 if exist %TARGET_NAME% del %TARGET_NAME%
 
+if not exist %~dp1 mkdir %~dp1
+
 for %%F in ("%MODULE_DIR%\*.cpp") do (
     echo "%%F"
     rem 一旦BOMを消すためにANSIを通す
