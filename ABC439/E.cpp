@@ -1342,6 +1342,33 @@ class UnionFind final
 
 #endif //___INCLUDED_UNIONFIND___
 
+#ifndef ___INCLUDED_LIS___
+#define ___INCLUDED_LIS___
+
+//! @brief 最長増加部分列
+class LIS
+{
+  public:
+    //! 最長増加部分列の長さを取得する
+    //! @tparam 型
+    template <class T>
+    static int64_t GetLength(const std::vector<T> &src)
+    {
+        const int64_t INF = std::numeric_limits<T>::max();
+        std::vector<T> dp(src.size(), INF);
+
+        for (int i = 0; i < src.size(); ++i)
+        {
+            auto itr = std::lower_bound(dp.begin(), dp.end(), src[i]);
+            *itr = std::min(*itr, src[i]);
+        }
+        auto pos = std::lower_bound(dp.begin(), dp.end(), INF);
+        return std::distance(dp.begin(), pos);
+    }
+};
+
+#endif //___INCLUDED_LIS___
+
 #ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
@@ -1512,17 +1539,13 @@ void AtcoderSolveHelper::Solve()
     }
 
     std::sort(R.begin(), R.end());
-
-    const int64_t INF = std::numeric_limits<int64_t>::max();
-    std::vector<int64_t> dp(N, INF);
-
-    for (int i = 0; i < N; ++i)
+    std::vector<int64_t> B;
+    for (auto &r : R)
     {
-        auto itr = std::lower_bound(dp.begin(), dp.end(), R[i].B);
-        *itr = std::min(*itr, R[i].B);
+        B.push_back(r.B);
     }
-    auto pos = std::lower_bound(dp.begin(), dp.end(), INF);
-    Out() << std::distance(dp.begin(), pos);
+
+    Out() << LIS::GetLength(B);
 }
 
 //----------------------編集スペースここまで--------------------------
