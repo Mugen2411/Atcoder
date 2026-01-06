@@ -6,7 +6,6 @@
 #include <iostream>
 #include <vector>
 
-
 /**
     @brief    二次元のグリッドを表すクラス
 
@@ -28,6 +27,37 @@ class Grid2D
     {
     }
 
+    //! @brief コピーコンストラクタ
+    //! @param rhs コピー元
+    Grid2D(const Grid2D<T> &rhs)
+        : m_data(rhs.GetHeight() * rhs.GetWidth()), m_width(rhs.GetWidth()), m_height(rhs.GetHeight())
+    {
+        int64_t sz = GetWidth() * GetHeight();
+        for (int64_t idx = 0; idx < sz; ++idx)
+        {
+            m_data[idx] = rhs.m_data[idx];
+        }
+    }
+
+    //! @brief コピー代入演算子
+    //! @param rhs コピー元
+    //! @return 自身の参照
+    Grid2D<T> &operator=(const Grid2D<T> &rhs)
+    {
+        m_width = rhs.GetWidth();
+        m_height = rhs.GetHeight();
+
+        int64_t sz = GetWidth() * GetHeight();
+        m_data.resize(sz);
+
+        for (int64_t idx = 0; idx < sz; ++idx)
+        {
+            m_data[idx] = rhs.m_data[idx];
+        }
+
+        return *this;
+    }
+
     /**
         @brief            指定した座標の値にアクセスする
 
@@ -38,13 +68,26 @@ class Grid2D
      */
     T &Ref(int64_t x, int64_t y)
     {
+        return const_cast<T &>(Get(x, y));
+    }
+
+    /**
+        @brief            指定した座標の値を読み取る
+
+        @param[in]    x   X座標
+        @param[in]    y   Y座標
+
+        @return         目的の座標の参照
+     */
+    const T &Get(int64_t x, int64_t y) const
+    {
         return m_data[GetIndex(x, y)];
     }
 
     /**
         @brief    高さの取得
 
-        @return 高さ
+        @return ���さ
      */
     int64_t GetHeight() const
     {
@@ -134,6 +177,36 @@ class Grid2D
         }
     }
 
+    //! @brief 不等価演算子
+    //! @param rhs 比較先
+    //! @return 不一致ならtrue
+    bool operator!=(const Grid2D<T> &rhs) const
+    {
+        if (GetHeight() != rhs.GetHeight() || GetWidth() != rhs.GetWidth())
+        {
+            return true;
+        }
+        for (int64_t y = 0; y < GetHeight(); ++y)
+        {
+            for (int64_t x = 0; x < GetWidth(); ++x)
+            {
+                if (Get(x, y) != rhs.Get(x, y))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //! @brief 等価演算子
+    //! @param rhs 比較先
+    //! @return 一致したらtrue
+    bool operator==(const Grid2D<T> &rhs) const
+    {
+        return !operator!=(rhs);
+    }
+
   private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
@@ -164,5 +237,38 @@ std::istream &operator>>(std::istream &stream, Grid2D<T> &dest)
     }
     return stream;
 }
+
+namespace std
+{
+/**
+        @brief	ビット管理クラスのハッシュ値を計算する
+
+        @tparam	 BitManagerを指定
+     */
+template <class T>
+struct hash<Grid2D<T>>
+{
+    /**
+            @brief	呼び出し演算子
+
+            @param[in]	val 対象
+            @return ハッシュ値
+         */
+    size_t operator()(const Grid2D<T> &src) const
+    {
+        size_t retval = 0;
+
+        for (int64_t y = 0; y < src.GetHeight(); ++y)
+        {
+            for (int64_t x = 0; x < src.GetWidth(); ++x)
+            {
+                retval <<= 7;
+                retval ^= src.Get(x, y);
+            }
+        }
+        return retval;
+    }
+};
+} // namespace std
 
 #endif //__INCLUDED_GRID2D__
