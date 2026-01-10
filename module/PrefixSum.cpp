@@ -6,29 +6,27 @@
 #include <iterator>
 #include <vector>
 
-
 /**
     @brief        累積和
 
-    @tparam     Iterator   範囲指定に使用するイテレータの型
+    @tparam     T 管理する数値型(整数ほぼ前提？)
  */
-template <class Iterator>
+template <class T>
 class PrefixSum
 {
   public:
-    using T = typename std::iterator_traits<Iterator>::value_type; //!< 格納する型
-
     /**
         @brief    コンストラクタ
 
         @param[in]    rawData     元となるデータ
     */
+    template <class Iterator>
     PrefixSum(Iterator beginItr, Iterator endItr) : m_data()
     {
-        int size = std::distance(beginItr, endItr);
+        int64_t size = std::distance(beginItr, endItr);
         m_data.resize(size + 1, 0);
-        int cur = 0;
-        for (decltype(beginItr) itr = beginItr; itr != endItr; itr = std::next(itr))
+        int64_t cur = 0;
+        for (auto itr = beginItr; itr != endItr; itr = std::next(itr))
         {
             m_data[cur + 1] = m_data[cur] + *itr;
             ++cur;
@@ -38,15 +36,15 @@ class PrefixSum
     /**
         @brief        累積和の取得
 
-        @param[in]    targetIdx   加算を終了するインデックス
-        @param[in]    offsetIdx   加算を開始するインデックス
-        @return                 累積和
+        @param[in]    endPos     終了位置
+        @param[in]    beginPos   開始位置
+        @return       累積和
      */
-    T GetSum(size_t targetIdx, size_t offsetIdx)
+    T GetSum(int64_t endPos, int64_t beginPos)
     {
-        assert(0 <= targetIdx && targetIdx < m_data.size());
-        assert(0 <= offsetIdx && offsetIdx < m_data.size());
-        return m_data[targetIdx] - m_data[offsetIdx];
+        assert(0 <= endPos && endPos < m_data.size());
+        assert(0 <= beginPos && beginPos < m_data.size());
+        return m_data[endPos] - m_data[beginPos];
     }
 
   private:
