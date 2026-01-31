@@ -1,16 +1,16 @@
 ﻿#ifndef ___RANGE_SET___
 #define ___RANGE_SET___
 
-#include <set>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 //! @brief	区間をsetで管理する奴
 //! @tparam	T 管理する型(整数型のみ)
 template <class T>
 class RangeSet
 {
-public:
+  public:
     //! @brief	区間(閉区間)
     struct Range
     {
@@ -42,11 +42,11 @@ public:
         }
     };
 
-public:
+  public:
     static const T INF;               //!< 無限大
     static const Range INVALID_RANGE; //!< 無効区間
 
-public:
+  public:
     //! @brief デフォルトコンストラクタ
     RangeSet()
     {
@@ -191,7 +191,7 @@ public:
         return sumErased;
     }
 
-private:
+  private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
     //! @param pivot 指定した点
     //! @return 最も近い範囲を指すイテレータ
@@ -200,7 +200,7 @@ private:
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
     }
 
-private:
+  private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
 
@@ -210,7 +210,7 @@ const T RangeSet<T>::INF = std::numeric_limits<T>::max() / 2;
 template <class T>
 const typename RangeSet<T>::Range RangeSet<T>::INVALID_RANGE = {.Left = INF, .Right = INF};
 
-#endif //___RANGE_SET___ 
+#endif //___RANGE_SET___
 #ifndef ___INCLUDED_BINARY_SEARCH___
 #define ___INCLUDED_BINARY_SEARCH___
 
@@ -236,7 +236,7 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
     return ok;
 }
 
-#endif //___INCLUDED_BINARY_SEARCH___ 
+#endif //___INCLUDED_BINARY_SEARCH___
 #ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
@@ -527,7 +527,7 @@ struct hash<BitManager>
 } // namespace std
 
 #endif //___INCLUDED_BITMAN___
- 
+
 #ifndef ___INCLUDED_FRACTION___
 #define ___INCLUDED_FRACTION___
 
@@ -800,7 +800,7 @@ class Fraction
     int64_t m_numerator;   //!< 分子
 };
 
-#endif //___INCLUDED_FRACTION___ 
+#endif //___INCLUDED_FRACTION___
 #ifndef ___INCLUDED_SEGMENT_TREE___
 #define ___INCLUDED_SEGMENT_TREE___
 
@@ -1020,14 +1020,13 @@ class SegmentTree
 template <class T>
 const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
 
-#endif //___INCLUDED_SEGMENT_TREE___ 
+#endif //___INCLUDED_SEGMENT_TREE___
 #ifndef ___INCLUDED_UNIONFIND___
 #define ___INCLUDED_UNIONFIND___
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
 
 /**
     @brief        UnionFind
@@ -1119,7 +1118,7 @@ class UnionFind final
 };
 
 #endif //___INCLUDED_UNIONFIND___
- 
+
 #ifndef ___INCLUDED_COMBINATION___
 #define ___INCLUDED_COMBINATION___
 
@@ -1142,7 +1141,7 @@ class Combination
     }
 };
 
-#endif //___INCLUDED_COMBINATION___ 
+#endif //___INCLUDED_COMBINATION___
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
@@ -1416,7 +1415,7 @@ struct hash<Grid2D<T>>
 };
 } // namespace std
 
-#endif //__INCLUDED_GRID2D__ 
+#endif //__INCLUDED_GRID2D__
 #ifndef ___INCLUDED_PREFIX_SUM___
 #define ___INCLUDED_PREFIX_SUM___
 
@@ -1470,7 +1469,7 @@ class PrefixSum
     std::vector<T> m_data; //!< データ構造
 };
 
-#endif //___INCLUDED_PREFIX_SUM___ 
+#endif //___INCLUDED_PREFIX_SUM___
 #ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
@@ -1478,7 +1477,7 @@ class PrefixSum
 #include <sstream>
 #include <string>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -1609,9 +1608,57 @@ int main()
 }
 
 //----------------------編集スペースここから--------------------------
+#include <unordered_map>
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N;
+    In() >> N;
+    std::vector<int64_t> R(N);
+    EachInput(R);
+
+    std::unordered_multimap<int64_t, int64_t> mp;
+    for (int i = 0; i < N; ++i)
+    {
+        mp.insert({R[i], i});
+    }
+
+    int64_t ans = 0;
+    for (int n = 0; n <= N; ++n)
+    {
+        auto range = mp.equal_range(n);
+        std::vector<decltype(mp)::value_type> update;
+        for (auto itr = range.first; itr != range.second; ++itr)
+        {
+            int64_t cur = itr->second;
+            if (0 <= cur - 1)
+            {
+                int64_t prev = cur - 1;
+                if (R[prev] > R[cur] + 1)
+                {
+                    ans += R[prev] - (R[cur] + 1);
+                    R[prev] = R[cur] + 1;
+                    update.push_back({R[cur] + 1, prev});
+                }
+            }
+            if (N > cur + 1)
+            {
+                int64_t next = cur + 1;
+                if (R[next] > R[cur] + 1)
+                {
+                    ans += R[next] - (R[cur] + 1);
+                    R[next] = R[cur] + 1;
+                    update.push_back({R[cur] + 1, next});
+                }
+            }
+        }
+
+        for (auto &u : update)
+        {
+            mp.insert(u);
+        }
+    }
+    Out() << ans << std::endl;
 }
 
 //----------------------編集スペースここまで--------------------------
