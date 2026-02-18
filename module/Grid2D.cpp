@@ -6,6 +6,155 @@
 #include <iostream>
 #include <vector>
 
+//! @brief 座標型
+struct POSITION
+{
+    //! @brief 右移動の差分を取得
+    //! @return 右移動の差分
+    static POSITION R()
+    {
+        return POSITION(1, 0);
+    }
+
+    //! @brief 左移動の差分を取得
+    //! @return 左移動の差分
+    static POSITION L()
+    {
+        return POSITION(-1, 0);
+    }
+
+    //! @brief 下移動の差分を取得
+    //! @return 下移動の差分
+    static POSITION D()
+    {
+        return POSITION(0, 1);
+    }
+
+    //! @brief 上移動の差分を取得
+    //! @return 上移動の差分
+    static POSITION U()
+    {
+        return POSITION(0, -1);
+    }
+
+    static POSITION RLDU(char dir)
+    {
+        switch (dir)
+        {
+        case 'R':
+            return R();
+        case 'L':
+            return L();
+        case 'D':
+            return D();
+        case 'U':
+            return U();
+        default:
+            return POSITION();
+        }
+    }
+
+  public:
+    //! @brief デフォルトコンストラクタ
+    POSITION() : X(0), Y(0)
+    {
+    }
+
+    //! @brief コンストラクタ
+    //! @param x
+    //! @param y
+    POSITION(int64_t x, int64_t y) : X(x), Y(y)
+    {
+    }
+
+    //! @brief コピーコンストラクタ
+    //! @param rhs コピー元
+    POSITION(const POSITION &rhs) : X(rhs.X), Y(rhs.Y)
+    {
+    }
+
+    //! @brief コピー代入演算子
+    //! @param rhs コピー元
+    //! @return 自身の参照
+    POSITION &operator=(const POSITION &rhs)
+    {
+        X = rhs.X;
+        Y = rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 加算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator+=(const POSITION &rhs)
+    {
+        X += rhs.X;
+        Y += rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 減算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator-=(const POSITION &rhs)
+    {
+        X -= rhs.X;
+        Y -= rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 乗算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator*=(const POSITION &rhs)
+    {
+        X *= rhs.X;
+        Y *= rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 加算演算子
+    //! @param rhs 右辺
+    //! @return 加算した結果
+    POSITION operator+(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval += rhs;
+
+        return retval;
+    }
+
+    //! @brief 減算演算子
+    //! @param rhs 右辺
+    //! @return 減算した結果
+    POSITION operator-(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval -= rhs;
+
+        return retval;
+    }
+
+    //! @brief 乗算演算子
+    //! @param rhs 右辺
+    //! @return 乗算した結果
+    POSITION operator*(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval *= rhs;
+
+        return retval;
+    }
+
+  public:
+    int64_t X; //!< X座標
+    int64_t Y; //!< Y座標
+};
+
 /**
     @brief    二次元のグリッドを表すクラス
 
@@ -14,6 +163,106 @@
 template <class T>
 class Grid2D
 {
+  public:
+    class Iterator
+    {
+      public:
+        //! @brief デフォルトコンストラクタ
+        Iterator() : m_pGrid(nullptr), m_position()
+        {
+        }
+
+        //! @brief コンストラクタ
+        //! @param grid グリッド
+        //! @param position 初期座標
+        Iterator(Grid2D &grid, const POSITION &position) : m_pGrid(&grid), m_position(position)
+        {
+        }
+
+        //! @brief コピーコンストラクタ
+        //! @param rhs コピー元
+        Iterator(const Iterator &rhs) : m_pGrid(rhs.m_pGrid), m_position(rhs.m_position)
+        {
+        }
+
+        //! @brief コピー代入演算子
+        //! @param rhs コピー元
+        //! @return 自身の参照
+        Iterator &operator=(const Iterator &rhs)
+        {
+            m_pGrid = rhs.m_pGrid;
+            m_position = rhs.m_position;
+
+            return *this;
+        }
+
+        //! @brief 加算代入演算子
+        //! @param rhs 右辺
+        //! @return 自身の参照
+        Iterator &operator+=(const POSITION &rhs)
+        {
+            m_position += rhs;
+
+            return *this;
+        }
+
+        //! @brief 減算代入演算子
+        //! @param rhs 右辺
+        //! @return 自身の参照
+        Iterator &operator-=(const POSITION &rhs)
+        {
+            m_position -= rhs;
+
+            return *this;
+        }
+        //! @brief 加算演算子
+        //! @param rhs 右辺
+        //! @return 加算の結果
+        Iterator operator+(const POSITION &rhs) const
+        {
+            Iterator retval = *this;
+            retval += rhs;
+
+            return retval;
+        }
+
+        //! @brief 減算演算子
+        //! @param rhs 右辺
+        //! @return 減算の結果
+        Iterator operator-(const POSITION &rhs) const
+        {
+            Iterator retval = *this;
+            retval -= rhs;
+
+            return retval;
+        }
+
+        //! @brief 参照演算子
+        //! @return 指している先の参照
+        T &operator*() const
+        {
+            return m_pGrid->Ref(m_position.X, m_position.Y);
+        }
+
+        //! @brief 指している先が範囲内か
+        //! @return 範囲内ならtrue
+        bool IsInner() const
+        {
+            return m_pGrid->IsInner(m_position.X, m_position.Y);
+        }
+
+        //! @brief インデックス取得
+        //! @return インデックス
+        int64_t GetIndex() const
+        {
+            return m_pGrid->GetIndex(m_position.X, m_position.Y);
+        }
+
+      private:
+        Grid2D *m_pGrid;     //!< グリッドのポインタ
+        POSITION m_position; //!< 指している座標
+    };
+
   public:
     /**
         @brief    コンストラクタ
@@ -207,6 +456,31 @@ class Grid2D
         return !operator!=(rhs);
     }
 
+    //! @brief イテレータ取得
+    //! @param idx インデックス
+    //! @return イテレータ
+    Iterator GetItr(int64_t idx)
+    {
+        return GetItr(GetX(idx), GetY(idx));
+    }
+
+    //! @brief イテレータ取得
+    //! @param x X座標
+    //! @param y Y座標
+    //! @return イテレータ
+    Iterator GetItr(int64_t x, int64_t y)
+    {
+        return GetItr({x, y});
+    }
+
+    //! @brief イテレータ取得
+    //! @param position 座標
+    //! @return イテレータ
+    Iterator GetItr(const POSITION &position)
+    {
+        return Iterator(*this, position);
+    }
+
   private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
@@ -241,9 +515,9 @@ std::istream &operator>>(std::istream &stream, Grid2D<T> &dest)
 namespace std
 {
 /**
-        @brief	ビット管理クラスのハッシュ値を計算する
+        @brief	2次元グリッドクラスのハッシュ値を計算する
 
-        @tparam	 BitManagerを指定
+        @tparam	 Grid2Dを指定
      */
 template <class T>
 struct hash<Grid2D<T>>
