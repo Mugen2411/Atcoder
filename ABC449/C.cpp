@@ -1619,11 +1619,19 @@ void AtcoderSolveHelper::Solve()
     In() >> S;
     int64_t ans = 0;
 
-    std::vector<int64_t> chrIdx[26];
+    int64_t cnt[26] = {0};
 
     for (int i = 0; i < N; ++i)
     {
-        chrIdx[S[i] - 'a'].push_back(i);
+        if (i >= L)
+        {
+            cnt[S[i - L] - 'a']++;
+        }
+        if (i > R)
+        {
+            --cnt[S[i - R - 1] - 'a'];
+        }
+        ans += cnt[S[i] - 'a'];
     }
 
     Out() << ans;
