@@ -1,9 +1,11 @@
 ﻿#ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 //! @brief 座標型
@@ -52,6 +54,13 @@ struct POSITION
         default:
             return POSITION();
         }
+    }
+
+    //! @brief RLDU文字配列を取得
+    //! @return RLDUが入った配列
+    static const std::array<char, 4> GetDirectionChars()
+    {
+        return {'R', 'L', 'D', 'U'};
     }
 
   public:
@@ -479,6 +488,23 @@ class Grid2D
     Iterator GetItr(const POSITION &position)
     {
         return Iterator(*this, position);
+    }
+
+    //! @brief 特定の値が存在する位置をコンテナに突っ込む
+    //! @tparam CONTAINER コンテナ型(中身はIterator型前提)
+    //! @param out 格納先
+    //! @param val 値
+    std::queue<Iterator> GetPositionsQueueByValue(T val)
+    {
+        std::queue<Iterator> ret;
+        for (int64_t idx = 0; idx < m_data.size(); ++idx)
+        {
+            if (m_data[idx] == val)
+            {
+                ret.push(GetItr(idx));
+            }
+        }
+        return ret;
     }
 
   private:
