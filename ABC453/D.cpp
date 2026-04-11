@@ -1199,9 +1199,11 @@ class PrefixSum
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
+#include <queue>
 #include <vector>
 
 //! @brief 座標型
@@ -1250,6 +1252,13 @@ struct POSITION
         default:
             return POSITION();
         }
+    }
+
+    //! @brief RLDU文字配列を取得
+    //! @return RLDUが入った配列
+    static const std::array<char, 4> GetDirectionChars()
+    {
+        return {'R', 'L', 'D', 'U'};
     }
 
   public:
@@ -1679,6 +1688,23 @@ class Grid2D
         return Iterator(*this, position);
     }
 
+    //! @brief 特定の値が存在する位置をコンテナに突っ込む
+    //! @tparam CONTAINER コンテナ型(中身はIterator型前提)
+    //! @param out 格納先
+    //! @param val 値
+    std::queue<Iterator> GetPositionsQueueByValue(T val)
+    {
+        std::queue<Iterator> ret;
+        for (int64_t idx = 0; idx < m_data.size(); ++idx)
+        {
+            if (m_data[idx] == val)
+            {
+                ret.push(GetItr(idx));
+            }
+        }
+        return ret;
+    }
+
   private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
@@ -1892,17 +1918,8 @@ void AtcoderSolveHelper::Solve()
     Grid2D<char> S(H, W, '.');
     In() >> S;
 
-    int64_t sIdx, gIdx;
-    S.ForEach([&](int64_t idx, char val) {
-        if (val == 'S')
-        {
-            sIdx = idx;
-        }
-        else if (val == 'G')
-        {
-            gIdx = idx;
-        }
-    });
+    auto sQ = S.GetPositionsQueueByValue('S');
+    auto sItr = sQ.front();
 
     std::vector<char> ans;
     std::unordered_map<int64_t, std::unordered_set<char>> searched;
@@ -1941,7 +1958,7 @@ void AtcoderSolveHelper::Solve()
         }
         else if (*itr == 'x')
         {
-            const char R[4] = {'R', 'L', 'D', 'U'};
+            auto R = POSITION::GetDirectionChars();
             for (auto &r : R)
             {
                 if (r != dir)
@@ -1957,7 +1974,7 @@ void AtcoderSolveHelper::Solve()
         }
         else if (*itr == '.' || *itr == 'S')
         {
-            const char R[4] = {'R', 'L', 'D', 'U'};
+            auto R = POSITION::GetDirectionChars();
             for (auto &r : R)
             {
                 bool res = self(self, r, itr + POSITION::RLDU(r));
@@ -1971,10 +1988,10 @@ void AtcoderSolveHelper::Solve()
         return false;
     };
 
-    const char R[4] = {'R', 'L', 'D', 'U'};
+    auto R = POSITION::GetDirectionChars();
     for (auto &r : R)
     {
-        _Dfs(_Dfs, r, S.GetItr(S.GetX(sIdx), S.GetY(sIdx)));
+        _Dfs(_Dfs, r, sItr);
     }
 
     if (ans.empty())
