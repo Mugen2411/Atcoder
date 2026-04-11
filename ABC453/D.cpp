@@ -1,16 +1,16 @@
 ﻿#ifndef ___RANGE_SET___
 #define ___RANGE_SET___
 
-#include <set>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 //! @brief	区間をsetで管理する奴
 //! @tparam	T 管理する型(整数型のみ)
 template <class T>
 class RangeSet
 {
-public:
+  public:
     //! @brief	区間(閉区間)
     struct Range
     {
@@ -42,11 +42,11 @@ public:
         }
     };
 
-public:
+  public:
     static const T INF;               //!< 無限大
     static const Range INVALID_RANGE; //!< 無効区間
 
-public:
+  public:
     //! @brief デフォルトコンストラクタ
     RangeSet()
     {
@@ -191,7 +191,7 @@ public:
         return sumErased;
     }
 
-private:
+  private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
     //! @param pivot 指定した点
     //! @return 最も近い範囲を指すイテレータ
@@ -200,7 +200,7 @@ private:
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
     }
 
-private:
+  private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
 
@@ -210,7 +210,7 @@ const T RangeSet<T>::INF = std::numeric_limits<T>::max() / 2;
 template <class T>
 const typename RangeSet<T>::Range RangeSet<T>::INVALID_RANGE = {.Left = INF, .Right = INF};
 
-#endif //___RANGE_SET___ 
+#endif //___RANGE_SET___
 #ifndef ___INCLUDED_BINARY_SEARCH___
 #define ___INCLUDED_BINARY_SEARCH___
 
@@ -236,7 +236,7 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
     return ok;
 }
 
-#endif //___INCLUDED_BINARY_SEARCH___ 
+#endif //___INCLUDED_BINARY_SEARCH___
 #ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
@@ -527,7 +527,7 @@ struct hash<BitManager>
 } // namespace std
 
 #endif //___INCLUDED_BITMAN___
- 
+
 #ifndef ___INCLUDED_FRACTION___
 #define ___INCLUDED_FRACTION___
 
@@ -800,7 +800,7 @@ class Fraction
     int64_t m_numerator;   //!< 分子
 };
 
-#endif //___INCLUDED_FRACTION___ 
+#endif //___INCLUDED_FRACTION___
 #ifndef ___INCLUDED_SEGMENT_TREE___
 #define ___INCLUDED_SEGMENT_TREE___
 
@@ -1020,14 +1020,13 @@ class SegmentTree
 template <class T>
 const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
 
-#endif //___INCLUDED_SEGMENT_TREE___ 
+#endif //___INCLUDED_SEGMENT_TREE___
 #ifndef ___INCLUDED_UNIONFIND___
 #define ___INCLUDED_UNIONFIND___
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
 
 /**
     @brief        UnionFind
@@ -1119,7 +1118,7 @@ class UnionFind final
 };
 
 #endif //___INCLUDED_UNIONFIND___
- 
+
 #ifndef ___INCLUDED_COMBINATION___
 #define ___INCLUDED_COMBINATION___
 
@@ -1142,7 +1141,7 @@ class Combination
     }
 };
 
-#endif //___INCLUDED_COMBINATION___ 
+#endif //___INCLUDED_COMBINATION___
 #ifndef ___INCLUDED_PREFIX_SUM___
 #define ___INCLUDED_PREFIX_SUM___
 
@@ -1196,7 +1195,7 @@ class PrefixSum
     std::vector<T> m_data; //!< データ構造
 };
 
-#endif //___INCLUDED_PREFIX_SUM___ 
+#endif //___INCLUDED_PREFIX_SUM___
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
@@ -1204,6 +1203,155 @@ class PrefixSum
 #include <cstdint>
 #include <iostream>
 #include <vector>
+
+//! @brief 座標型
+struct POSITION
+{
+    //! @brief 右移動の差分を取得
+    //! @return 右移動の差分
+    static POSITION R()
+    {
+        return POSITION(1, 0);
+    }
+
+    //! @brief 左移動の差分を取得
+    //! @return 左移動の差分
+    static POSITION L()
+    {
+        return POSITION(-1, 0);
+    }
+
+    //! @brief 下移動の差分を取得
+    //! @return 下移動の差分
+    static POSITION D()
+    {
+        return POSITION(0, 1);
+    }
+
+    //! @brief 上移動の差分を取得
+    //! @return 上移動の差分
+    static POSITION U()
+    {
+        return POSITION(0, -1);
+    }
+
+    static POSITION RLDU(char dir)
+    {
+        switch (dir)
+        {
+        case 'R':
+            return R();
+        case 'L':
+            return L();
+        case 'D':
+            return D();
+        case 'U':
+            return U();
+        default:
+            return POSITION();
+        }
+    }
+
+  public:
+    //! @brief デフォルトコンストラクタ
+    POSITION() : X(0), Y(0)
+    {
+    }
+
+    //! @brief コンストラクタ
+    //! @param x
+    //! @param y
+    POSITION(int64_t x, int64_t y) : X(x), Y(y)
+    {
+    }
+
+    //! @brief コピーコンストラクタ
+    //! @param rhs コピー元
+    POSITION(const POSITION &rhs) : X(rhs.X), Y(rhs.Y)
+    {
+    }
+
+    //! @brief コピー代入演算子
+    //! @param rhs コピー元
+    //! @return 自身の参照
+    POSITION &operator=(const POSITION &rhs)
+    {
+        X = rhs.X;
+        Y = rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 加算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator+=(const POSITION &rhs)
+    {
+        X += rhs.X;
+        Y += rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 減算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator-=(const POSITION &rhs)
+    {
+        X -= rhs.X;
+        Y -= rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 乗算代入演算子
+    //! @param rhs 右辺
+    //! @return 自身の参照
+    POSITION &operator*=(const POSITION &rhs)
+    {
+        X *= rhs.X;
+        Y *= rhs.Y;
+
+        return *this;
+    }
+
+    //! @brief 加算演算子
+    //! @param rhs 右辺
+    //! @return 加算した結果
+    POSITION operator+(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval += rhs;
+
+        return retval;
+    }
+
+    //! @brief 減算演算子
+    //! @param rhs 右辺
+    //! @return 減算した結果
+    POSITION operator-(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval -= rhs;
+
+        return retval;
+    }
+
+    //! @brief 乗算演算子
+    //! @param rhs 右辺
+    //! @return 乗算した結果
+    POSITION operator*(const POSITION &rhs) const
+    {
+        POSITION retval = *this;
+        retval *= rhs;
+
+        return retval;
+    }
+
+  public:
+    int64_t X; //!< X座標
+    int64_t Y; //!< Y座標
+};
 
 /**
     @brief    二次元のグリッドを表すクラス
@@ -1213,6 +1361,106 @@ class PrefixSum
 template <class T>
 class Grid2D
 {
+  public:
+    class Iterator
+    {
+      public:
+        //! @brief デフォルトコンストラクタ
+        Iterator() : m_pGrid(nullptr), m_position()
+        {
+        }
+
+        //! @brief コンストラクタ
+        //! @param grid グリッド
+        //! @param position 初期座標
+        Iterator(Grid2D &grid, const POSITION &position) : m_pGrid(&grid), m_position(position)
+        {
+        }
+
+        //! @brief コピーコンストラクタ
+        //! @param rhs コピー元
+        Iterator(const Iterator &rhs) : m_pGrid(rhs.m_pGrid), m_position(rhs.m_position)
+        {
+        }
+
+        //! @brief コピー代入演算子
+        //! @param rhs コピー元
+        //! @return 自身の参照
+        Iterator &operator=(const Iterator &rhs)
+        {
+            m_pGrid = rhs.m_pGrid;
+            m_position = rhs.m_position;
+
+            return *this;
+        }
+
+        //! @brief 加算代入演算子
+        //! @param rhs 右辺
+        //! @return 自身の参照
+        Iterator &operator+=(const POSITION &rhs)
+        {
+            m_position += rhs;
+
+            return *this;
+        }
+
+        //! @brief 減算代入演算子
+        //! @param rhs 右辺
+        //! @return 自身の参照
+        Iterator &operator-=(const POSITION &rhs)
+        {
+            m_position -= rhs;
+
+            return *this;
+        }
+        //! @brief 加算演算子
+        //! @param rhs 右辺
+        //! @return 加算の結果
+        Iterator operator+(const POSITION &rhs) const
+        {
+            Iterator retval = *this;
+            retval += rhs;
+
+            return retval;
+        }
+
+        //! @brief 減算演算子
+        //! @param rhs 右辺
+        //! @return 減算の結果
+        Iterator operator-(const POSITION &rhs) const
+        {
+            Iterator retval = *this;
+            retval -= rhs;
+
+            return retval;
+        }
+
+        //! @brief 参照演算子
+        //! @return 指している先の参照
+        T &operator*() const
+        {
+            return m_pGrid->Ref(m_position.X, m_position.Y);
+        }
+
+        //! @brief 指している先が範囲内か
+        //! @return 範囲内ならtrue
+        bool IsInner() const
+        {
+            return m_pGrid->IsInner(m_position.X, m_position.Y);
+        }
+
+        //! @brief インデックス取得
+        //! @return インデックス
+        int64_t GetIndex() const
+        {
+            return m_pGrid->GetIndex(m_position.X, m_position.Y);
+        }
+
+      private:
+        Grid2D *m_pGrid;     //!< グリッドのポインタ
+        POSITION m_position; //!< 指している座標
+    };
+
   public:
     /**
         @brief    コンストラクタ
@@ -1406,6 +1654,31 @@ class Grid2D
         return !operator!=(rhs);
     }
 
+    //! @brief イテレータ取得
+    //! @param idx インデックス
+    //! @return イテレータ
+    Iterator GetItr(int64_t idx)
+    {
+        return GetItr(GetX(idx), GetY(idx));
+    }
+
+    //! @brief イテレータ取得
+    //! @param x X座標
+    //! @param y Y座標
+    //! @return イテレータ
+    Iterator GetItr(int64_t x, int64_t y)
+    {
+        return GetItr({x, y});
+    }
+
+    //! @brief イテレータ取得
+    //! @param position 座標
+    //! @return イテレータ
+    Iterator GetItr(const POSITION &position)
+    {
+        return Iterator(*this, position);
+    }
+
   private:
     std::vector<T> m_data; //!< 本体となる配列
     int64_t m_width;       //!< 幅
@@ -1440,9 +1713,9 @@ std::istream &operator>>(std::istream &stream, Grid2D<T> &dest)
 namespace std
 {
 /**
-        @brief	ビット管理クラスのハッシュ値を計算する
+        @brief	2次元グリッドクラスのハッシュ値を計算する
 
-        @tparam	 BitManagerを指定
+        @tparam	 Grid2Dを指定
      */
 template <class T>
 struct hash<Grid2D<T>>
@@ -1470,7 +1743,7 @@ struct hash<Grid2D<T>>
 };
 } // namespace std
 
-#endif //__INCLUDED_GRID2D__ 
+#endif //__INCLUDED_GRID2D__
 #ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
@@ -1609,9 +1882,116 @@ int main()
 }
 
 //----------------------編集スペースここから--------------------------
+#include <unordered_map>
+#include <unordered_set>
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t H, W;
+    In() >> H >> W;
+    Grid2D<char> S(H, W, '.');
+    In() >> S;
+
+    int64_t sIdx, gIdx;
+    S.ForEach([&](int64_t idx, char val) {
+        if (val == 'S')
+        {
+            sIdx = idx;
+        }
+        else if (val == 'G')
+        {
+            gIdx = idx;
+        }
+    });
+
+    std::vector<char> ans;
+    std::unordered_map<int64_t, std::unordered_set<char>> searched;
+    auto _Dfs = [&](auto self, char dir, Grid2D<char>::Iterator itr) -> bool {
+        if (!ans.empty())
+        {
+            return false;
+        }
+        if (!itr.IsInner())
+        {
+            return false;
+        }
+        if (*itr == '#')
+        {
+            return false;
+        }
+        if (searched[itr.GetIndex()].count(dir) != 0)
+        {
+            return false;
+        }
+        searched[itr.GetIndex()].insert(dir);
+        if (*itr == 'G')
+        {
+            ans.push_back(dir);
+            return true;
+        }
+
+        if (*itr == 'o')
+        {
+            bool res = self(self, dir, itr + POSITION::RLDU(dir));
+            if (res)
+            {
+                ans.push_back(dir);
+                return true;
+            }
+        }
+        else if (*itr == 'x')
+        {
+            const char R[4] = {'R', 'L', 'D', 'U'};
+            for (auto &r : R)
+            {
+                if (r != dir)
+                {
+                    bool res = self(self, r, itr + POSITION::RLDU(r));
+                    if (res)
+                    {
+                        ans.push_back(dir);
+                        return true;
+                    }
+                }
+            }
+        }
+        else if (*itr == '.' || *itr == 'S')
+        {
+            const char R[4] = {'R', 'L', 'D', 'U'};
+            for (auto &r : R)
+            {
+                bool res = self(self, r, itr + POSITION::RLDU(r));
+                if (res)
+                {
+                    ans.push_back(dir);
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    const char R[4] = {'R', 'L', 'D', 'U'};
+    for (auto &r : R)
+    {
+        _Dfs(_Dfs, r, S.GetItr(S.GetX(sIdx), S.GetY(sIdx)));
+    }
+
+    if (ans.empty())
+    {
+        No();
+        return;
+    }
+    else
+    {
+        Yes();
+        ans.pop_back();
+        std::reverse(ans.begin(), ans.end());
+        for (auto d : ans)
+        {
+            Out() << d;
+        }
+    }
 }
 
 //----------------------編集スペースここまで--------------------------
