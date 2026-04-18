@@ -1778,7 +1778,7 @@ struct hash<Grid2D<T>>
 #include <sstream>
 #include <string>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -1912,6 +1912,119 @@ int main()
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N, A, B;
+    In() >> N >> A >> B;
+
+    --A, --B;
+
+    if(N % 2 == 1 || (A+B) % 2 == 0){
+        No();
+        return;
+    }
+
+    Grid2D<char> G(N, N, '.');
+    G.Ref(B, A) = '#';
+    G.Ref(N-1, N-1) = 'G';
+
+    auto curPos = G.GetItr(0, 0);
+    auto _GetReversed = [](char dir){
+        switch (dir)
+        {
+        case 'U':
+            return 'D';
+        case 'D':
+            return 'U';
+        case 'L':
+            return 'R';
+        case 'R':
+            return 'L';
+        }
+    };
+
+    std::string ans;
+    char straight = 'D';
+    char turn = 'R';
+    bool isVertical = true;
+    if(A % 2 == 0){
+        straight = 'R';
+        turn = 'D';
+        isVertical = false;
+    }
+    *curPos = '#';
+
+    auto _Move = [&](char dir){
+        ans.push_back(dir);
+        curPos += POSITION::RLDU(dir);
+        bool isGoal = *curPos == 'G';
+        *curPos = '#';
+        return isGoal;
+    };
+    int numU = (isVertical? B: A)/2;
+    for(int i=0; i<numU; ++i){
+        for(int j=0; j<N-1; ++j){
+            _Move(straight);
+        }
+        straight = _GetReversed(straight);
+        _Move(turn);
+        for(int j=0; j<N-1; ++j){
+            _Move(straight);
+        }
+        straight = _GetReversed(straight);
+        _Move(turn);
+    }
+
+    std::array<char, 4> unitL = {'D', 'R', 'U', 'R'};
+    std::array<char, 2> unitC = {'D', 'R'};
+    std::array<char, 4> unitR = {'R', 'U', 'R', 'D'};
+
+    if(isVertical){
+        unitL = {'R', 'D', 'L', 'D'};
+        unitC = {'R', 'D'};
+        unitR = {'D', 'L', 'D', 'R'};
+    }
+
+    int numL = ((isVertical?A:B) +1)/2 - 1;
+    for(int i=0;i<numL; ++i){
+        for(auto d : unitL){
+            _Move(d);
+        }
+    }
+    for(auto d : unitC){
+        _Move(d);
+    }
+    for(int i=0;i<(N/2 - numL - 1); ++i){
+        for(auto d : unitR){
+            _Move(d);
+        }
+    }
+    straight = _GetReversed(straight);
+    for(int i=0; i<(N - numU*2 - 2) / 2; ++i){
+       _Move(turn); 
+        for(int j=0; j<N-1; ++j){
+            _Move(straight);
+        }
+        straight = _GetReversed(straight);
+        _Move(turn);
+        for(int j=0; j<N-1; ++j){
+            _Move(straight);
+        }
+        straight = _GetReversed(straight);
+    }
+
+    Yes();
+    Out() << ans << std::endl;
+    
+    /*
+    for(int y =0 ;y<N; ++y)
+    {
+        for(int x=0; x<N; ++x)
+        {
+            Error() << G.Ref(x, y);
+        }
+        Error() << std::endl;
+    }
+    */
+    
 }
 
 //----------------------編集スペースここまで--------------------------

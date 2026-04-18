@@ -1912,6 +1912,38 @@ int main()
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N, M;
+    In() >> N >> M;
+    std::vector<std::vector<int64_t>> graph(N);
+
+    for(int i=0; i<M; ++i){
+        int64_t A, B;
+        In() >> A >> B;
+        --A, --B;
+
+        graph[A].push_back(B);
+    }
+    std::vector<bool> reachable(N, false);
+
+    auto _Dfs = [&](auto self, int64_t cur)->void{
+        if(reachable[cur]){
+            return;
+        }
+        reachable[cur] = true;
+        for(auto e : graph[cur]){
+            self(self, e);
+        }
+    };
+
+    _Dfs(_Dfs, 0);
+
+    int64_t sum = 0;
+    for(auto r : reachable){
+        if(r){
+            ++sum;
+        }
+    }
+    Out() << sum;
 }
 
 //----------------------編集スペースここまで--------------------------

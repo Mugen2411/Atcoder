@@ -1909,9 +1909,20 @@ int main()
 }
 
 //----------------------編集スペースここから--------------------------
-
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N, M;
+    In() >> N >> M;
+    std::vector<int64_t> F(N);
+    EachInput(F);
+
+    std::set<int> st;
+    for(auto f : F){
+        st.insert(f);
+    }
+
+    YesNo(st.size() == N);
+    YesNo(st.size() == M);
 }
 
 //----------------------編集スペースここまで--------------------------

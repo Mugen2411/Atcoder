@@ -1912,6 +1912,9 @@ int main()
 
 void AtcoderSolveHelper::Solve()
 {
+    int L, R;
+    In() >> L >> R;
+    Out() << R - L + 1;
 }
 
 //----------------------編集スペースここまで--------------------------

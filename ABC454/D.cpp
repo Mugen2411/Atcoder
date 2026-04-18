@@ -1778,7 +1778,7 @@ struct hash<Grid2D<T>>
 #include <sstream>
 #include <string>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -1910,8 +1910,51 @@ int main()
 
 //----------------------編集スペースここから--------------------------
 
+#include <stack>
+
 void AtcoderSolveHelper::Solve()
 {
+    std::string A, B;
+    In() >> A >> B;
+
+    auto _Remove = [](std::string& res, std::string str){
+        for(auto c : str){
+            res.push_back(c);
+
+            if(res.size() >= 4){
+                size_t lastIdx = res.size() - 1;
+                if(res[lastIdx] == ')' && res[lastIdx - 1] == 'x' && res[lastIdx - 2] == 'x' && res[lastIdx - 3] == '(')
+                {
+                    res.pop_back();
+                    res.pop_back();
+                    res.pop_back();
+                    res.pop_back();
+                    res.push_back('x');
+                    res.push_back('x');
+                }
+            }
+        }
+    };
+
+    std::string afA;
+    _Remove(afA, A);
+    std::string afB;
+    _Remove(afB, B);
+
+    bool isAns = true;
+    if(afA.size() != afB.size()){
+        isAns = false;
+    }else{
+        for(int i=0; i<afA.size(); ++i){
+            if(afA[i] != afB[i])
+            {
+                isAns = false;
+                break;
+            }
+        }
+    }
+
+    YesNo(isAns);
 }
 
 //----------------------編集スペースここまで--------------------------
