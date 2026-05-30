@@ -39,6 +39,9 @@ struct POSITION
         return POSITION(0, -1);
     }
 
+    //! @brief RLDUから座標差分を取得する
+    //! @param dir R,L,D,Uの文字
+    //! @return 対応する方向
     static POSITION RLDU(char dir)
     {
         switch (dir)
@@ -61,6 +64,41 @@ struct POSITION
     static const std::array<char, 4> GetDirectionChars()
     {
         return {'R', 'L', 'D', 'U'};
+    }
+
+    //! @brief テンキーから座標差分を取得する
+    //! @param dir 1~9の文字(数値ではなく文字コード)
+    //! @return 対応する方向
+    static POSITION Tenkey(char dir)
+    {
+        switch (dir)
+        {
+        case '1':
+            return L() + D();
+        case '2':
+            return D();
+        case '3':
+            return R() + D();
+        case '4':
+            return L();
+        case '6':
+            return R();
+        case '7':
+            return L() + U();
+        case '8':
+            return U();
+        case '9':
+            return R() + U();
+        default:
+            return POSITION();
+        }
+    }
+
+    //! @brief テンキーで使う文字一覧を取得
+    //! @return 文字一覧
+    static const std::array<char, 8> GetTenkeyChars()
+    {
+        return {'1', '2', '3', '4', '6', '7', '8', '9'};
     }
 
   public:
