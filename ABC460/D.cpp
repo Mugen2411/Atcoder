@@ -1,16 +1,16 @@
 ﻿#ifndef ___RANGE_SET___
 #define ___RANGE_SET___
 
-#include <set>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 //! @brief	区間をsetで管理する奴
 //! @tparam	T 管理する型(整数型のみ)
 template <class T>
 class RangeSet
 {
-public:
+  public:
     //! @brief	区間(閉区間)
     struct Range
     {
@@ -42,11 +42,11 @@ public:
         }
     };
 
-public:
+  public:
     static const T INF;               //!< 無限大
     static const Range INVALID_RANGE; //!< 無効区間
 
-public:
+  public:
     //! @brief デフォルトコンストラクタ
     RangeSet()
     {
@@ -191,7 +191,7 @@ public:
         return sumErased;
     }
 
-private:
+  private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
     //! @param pivot 指定した点
     //! @return 最も近い範囲を指すイテレータ
@@ -200,7 +200,7 @@ private:
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
     }
 
-private:
+  private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
 
@@ -210,7 +210,7 @@ const T RangeSet<T>::INF = std::numeric_limits<T>::max() / 2;
 template <class T>
 const typename RangeSet<T>::Range RangeSet<T>::INVALID_RANGE = {.Left = INF, .Right = INF};
 
-#endif //___RANGE_SET___ 
+#endif //___RANGE_SET___
 #ifndef ___INCLUDED_BINARY_SEARCH___
 #define ___INCLUDED_BINARY_SEARCH___
 
@@ -236,7 +236,7 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
     return ok;
 }
 
-#endif //___INCLUDED_BINARY_SEARCH___ 
+#endif //___INCLUDED_BINARY_SEARCH___
 #ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
@@ -527,7 +527,7 @@ struct hash<BitManager>
 } // namespace std
 
 #endif //___INCLUDED_BITMAN___
- 
+
 #ifndef ___INCLUDED_FRACTION___
 #define ___INCLUDED_FRACTION___
 
@@ -800,7 +800,7 @@ class Fraction
     int64_t m_numerator;   //!< 分子
 };
 
-#endif //___INCLUDED_FRACTION___ 
+#endif //___INCLUDED_FRACTION___
 #ifndef ___INCLUDED_SEGMENT_TREE___
 #define ___INCLUDED_SEGMENT_TREE___
 
@@ -1020,14 +1020,13 @@ class SegmentTree
 template <class T>
 const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
 
-#endif //___INCLUDED_SEGMENT_TREE___ 
+#endif //___INCLUDED_SEGMENT_TREE___
 #ifndef ___INCLUDED_UNIONFIND___
 #define ___INCLUDED_UNIONFIND___
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
 
 /**
     @brief        UnionFind
@@ -1119,7 +1118,7 @@ class UnionFind final
 };
 
 #endif //___INCLUDED_UNIONFIND___
- 
+
 #ifndef ___INCLUDED_COMBINATION___
 #define ___INCLUDED_COMBINATION___
 
@@ -1142,7 +1141,7 @@ class Combination
     }
 };
 
-#endif //___INCLUDED_COMBINATION___ 
+#endif //___INCLUDED_COMBINATION___
 #ifndef ___INCLUDED_PREFIX_SUM___
 #define ___INCLUDED_PREFIX_SUM___
 
@@ -1196,7 +1195,7 @@ class PrefixSum
     std::vector<T> m_data; //!< データ構造
 };
 
-#endif //___INCLUDED_PREFIX_SUM___ 
+#endif //___INCLUDED_PREFIX_SUM___
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
@@ -1238,6 +1237,9 @@ struct POSITION
         return POSITION(0, -1);
     }
 
+    //! @brief RLDUから座標差分を取得する
+    //! @param dir R,L,D,Uの文字
+    //! @return 対応する方向
     static POSITION RLDU(char dir)
     {
         switch (dir)
@@ -1260,6 +1262,41 @@ struct POSITION
     static const std::array<char, 4> GetDirectionChars()
     {
         return {'R', 'L', 'D', 'U'};
+    }
+
+    //! @brief テンキーから座標差分を取得する
+    //! @param dir 1~9の文字(数値ではなく文字コード)
+    //! @return 対応する方向
+    static POSITION Tenkey(char dir)
+    {
+        switch (dir)
+        {
+        case '1':
+            return L() + D();
+        case '2':
+            return D();
+        case '3':
+            return R() + D();
+        case '4':
+            return L();
+        case '6':
+            return R();
+        case '7':
+            return L() + U();
+        case '8':
+            return U();
+        case '9':
+            return R() + U();
+        default:
+            return POSITION();
+        }
+    }
+
+    //! @brief テンキーで使う文字一覧を取得
+    //! @return 文字一覧
+    static const std::array<char, 8> GetTenkeyChars()
+    {
+        return {'1', '2', '3', '4', '6', '7', '8', '9'};
     }
 
   public:
@@ -1770,7 +1807,7 @@ struct hash<Grid2D<T>>
 };
 } // namespace std
 
-#endif //__INCLUDED_GRID2D__ 
+#endif //__INCLUDED_GRID2D__
 #ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
@@ -1912,6 +1949,131 @@ int main()
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t H, W;
+    In() >> H >> W;
+    Grid2D<char> S(H, W, '.');
+    In() >> S;
+    Grid2D<char> init(S);
+
+    Grid2D<int> searched(H, W, 0);
+
+    auto q = S.GetPositionsQueueByValue('#');
+
+    // 2手目で黒に戻れないやつを白にする
+    while (!q.empty())
+    {
+        auto curPos = q.front();
+        q.pop();
+
+        int64_t numBlack = 0;
+        int64_t numValid = 0;
+
+        for (char dir : POSITION::GetTenkeyChars())
+        {
+            auto nextPos = curPos + POSITION::Tenkey(dir);
+            if (nextPos.IsInner())
+            {
+                ++numValid;
+                if (*init.GetItr(nextPos.GetIndex()) == '#')
+                {
+                    ++numBlack;
+                }
+            }
+        }
+
+        if (numBlack == numValid)
+        {
+            *curPos = '.';
+        }
+    }
+
+    q = S.GetPositionsQueueByValue('#');
+
+    std::queue<int64_t> distQ;
+    for (int i = 0; i < q.size(); ++i)
+    {
+        distQ.push(0);
+    }
+
+    while (!q.empty())
+    {
+        auto curPos = q.front();
+        q.pop();
+        auto dist = distQ.front();
+        distQ.pop();
+
+        if (*searched.GetItr(curPos.GetIndex()) != 0)
+        {
+            continue;
+        }
+
+        *searched.GetItr(curPos.GetIndex()) = 1;
+        if (dist % 2 == 0)
+        {
+            *curPos = '#';
+        }
+        else
+        {
+            *curPos = '.';
+        }
+
+        for (char dir : POSITION::GetTenkeyChars())
+        {
+            auto nextPos = curPos + POSITION::Tenkey(dir);
+            if (nextPos.IsInner() && *searched.GetItr(nextPos.GetIndex()) == 0)
+            {
+                q.push(nextPos);
+                distQ.push(dist + 1);
+            }
+        }
+    }
+
+    q = S.GetPositionsQueueByValue('.');
+    for (int i = 0; i < q.size(); ++i)
+    {
+        distQ.push(0);
+    }
+    while (!q.empty())
+    {
+        auto curPos = q.front();
+        q.pop();
+        auto dist = distQ.front();
+        distQ.pop();
+
+        if (*searched.GetItr(curPos.GetIndex()) != 0)
+        {
+            continue;
+        }
+
+        *searched.GetItr(curPos.GetIndex()) = 1;
+        if (dist % 2 == 1)
+        {
+            *curPos = '#';
+        }
+        else
+        {
+            *curPos = '.';
+        }
+
+        for (char dir : POSITION::GetTenkeyChars())
+        {
+            auto nextPos = curPos + POSITION::Tenkey(dir);
+            if (nextPos.IsInner() && *searched.GetItr(nextPos.GetIndex()) == 0)
+            {
+                q.push(nextPos);
+                distQ.push(dist + 1);
+            }
+        }
+    }
+
+    for (int y = 0; y < S.GetHeight(); ++y)
+    {
+        for (int x = 0; x < S.GetWidth(); ++x)
+        {
+            Out() << S.Ref(x, y);
+        }
+        Out() << std::endl;
+    }
 }
 
 //----------------------編集スペースここまで--------------------------
