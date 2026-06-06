@@ -1987,6 +1987,7 @@ void AtcoderSolveHelper::Solve()
         }
     }
 
+    // 生き残った黒を起点に偶数手目で黒になるマスを検出
     q = S.GetPositionsQueueByValue('#');
 
     std::queue<int64_t> distQ;
@@ -2011,48 +2012,6 @@ void AtcoderSolveHelper::Solve()
         if (dist % 2 == 0)
         {
             *curPos = '#';
-        }
-        else
-        {
-            *curPos = '.';
-        }
-
-        for (char dir : POSITION::GetTenkeyChars())
-        {
-            auto nextPos = curPos + POSITION::Tenkey(dir);
-            if (nextPos.IsInner() && *searched.GetItr(nextPos.GetIndex()) == 0)
-            {
-                q.push(nextPos);
-                distQ.push(dist + 1);
-            }
-        }
-    }
-
-    q = S.GetPositionsQueueByValue('.');
-    for (int i = 0; i < q.size(); ++i)
-    {
-        distQ.push(0);
-    }
-    while (!q.empty())
-    {
-        auto curPos = q.front();
-        q.pop();
-        auto dist = distQ.front();
-        distQ.pop();
-
-        if (*searched.GetItr(curPos.GetIndex()) != 0)
-        {
-            continue;
-        }
-
-        *searched.GetItr(curPos.GetIndex()) = 1;
-        if (dist % 2 == 1)
-        {
-            *curPos = '#';
-        }
-        else
-        {
-            *curPos = '.';
         }
 
         for (char dir : POSITION::GetTenkeyChars())
