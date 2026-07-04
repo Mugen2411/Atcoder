@@ -1,16 +1,16 @@
 ﻿#ifndef ___RANGE_SET___
 #define ___RANGE_SET___
 
-#include <set>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 //! @brief	区間をsetで管理する奴
 //! @tparam	T 管理する型(整数型のみ)
 template <class T>
 class RangeSet
 {
-public:
+  public:
     //! @brief	区間(閉区間)
     struct Range
     {
@@ -42,11 +42,11 @@ public:
         }
     };
 
-public:
+  public:
     static const T INF;               //!< 無限大
     static const Range INVALID_RANGE; //!< 無効区間
 
-public:
+  public:
     //! @brief デフォルトコンストラクタ
     RangeSet()
     {
@@ -191,7 +191,7 @@ public:
         return sumErased;
     }
 
-private:
+  private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
     //! @param pivot 指定した点
     //! @return 最も近い範囲を指すイテレータ
@@ -200,7 +200,7 @@ private:
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
     }
 
-private:
+  private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
 
@@ -210,7 +210,7 @@ const T RangeSet<T>::INF = std::numeric_limits<T>::max() / 2;
 template <class T>
 const typename RangeSet<T>::Range RangeSet<T>::INVALID_RANGE = {.Left = INF, .Right = INF};
 
-#endif //___RANGE_SET___ 
+#endif //___RANGE_SET___
 #ifndef ___INCLUDED_BINARY_SEARCH___
 #define ___INCLUDED_BINARY_SEARCH___
 
@@ -236,7 +236,7 @@ int64_t BinarySearch(int64_t ng, int64_t ok, F comp)
     return ok;
 }
 
-#endif //___INCLUDED_BINARY_SEARCH___ 
+#endif //___INCLUDED_BINARY_SEARCH___
 #ifndef ___INCLUDED_BITMAN___
 #define ___INCLUDED_BITMAN___
 
@@ -527,7 +527,7 @@ struct hash<BitManager>
 } // namespace std
 
 #endif //___INCLUDED_BITMAN___
- 
+
 #ifndef ___INCLUDED_FRACTION___
 #define ___INCLUDED_FRACTION___
 
@@ -800,7 +800,7 @@ class Fraction
     int64_t m_numerator;   //!< 分子
 };
 
-#endif //___INCLUDED_FRACTION___ 
+#endif //___INCLUDED_FRACTION___
 #ifndef ___INCLUDED_SEGMENT_TREE___
 #define ___INCLUDED_SEGMENT_TREE___
 
@@ -1020,14 +1020,13 @@ class SegmentTree
 template <class T>
 const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
 
-#endif //___INCLUDED_SEGMENT_TREE___ 
+#endif //___INCLUDED_SEGMENT_TREE___
 #ifndef ___INCLUDED_UNIONFIND___
 #define ___INCLUDED_UNIONFIND___
 
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
 
 /**
     @brief        UnionFind
@@ -1119,7 +1118,7 @@ class UnionFind final
 };
 
 #endif //___INCLUDED_UNIONFIND___
- 
+
 #ifndef ___INCLUDED_COMBINATION___
 #define ___INCLUDED_COMBINATION___
 
@@ -1142,7 +1141,7 @@ class Combination
     }
 };
 
-#endif //___INCLUDED_COMBINATION___ 
+#endif //___INCLUDED_COMBINATION___
 #ifndef ___INCLUDED_PREFIX_SUM___
 #define ___INCLUDED_PREFIX_SUM___
 
@@ -1196,7 +1195,7 @@ class PrefixSum
     std::vector<T> m_data; //!< データ構造
 };
 
-#endif //___INCLUDED_PREFIX_SUM___ 
+#endif //___INCLUDED_PREFIX_SUM___
 #ifndef __INCLUDED_GRID2D__
 #define __INCLUDED_GRID2D__
 
@@ -1808,7 +1807,7 @@ struct hash<Grid2D<T>>
 };
 } // namespace std
 
-#endif //__INCLUDED_GRID2D__ 
+#endif //__INCLUDED_GRID2D__
 #ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
@@ -1816,7 +1815,7 @@ struct hash<Grid2D<T>>
 #include <sstream>
 #include <string>
 
-// #define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
+#define ENABLE_MULTICASE //!< マルチケース用スイッチ：コメントを外すとマルチケースになる
 
 /**
     @brief	Atcoderの解答を行うのに便利なクラス
@@ -1950,6 +1949,53 @@ int main()
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N;
+    std::string S;
+    In() >> N >> S;
+    std::vector<int64_t> X(N);
+    std::vector<int64_t> Y(N - 1);
+    EachInput(X);
+    EachInput(Y);
+
+    std::vector<int64_t> benefit(N - 1);
+
+    for (int i = 0; i < N - 1; ++i)
+    {
+        if (S[i] == 'S')
+        {
+            benefit[i] -= X[i];
+        }
+        if (S[i + 1] == 'R')
+        {
+            benefit[i] -= X[i + 1];
+        }
+        benefit[i] += Y[i];
+    }
+
+    if (N == 2)
+    {
+        Out() << std::max<int64_t>(0, benefit[0]) << std::endl;
+        return;
+    }
+
+    std::vector<int64_t> dp(N, 0);
+    dp[0] = 0;
+    dp[1] = std::max<int64_t>(0, benefit[0]);
+    dp[2] = std::max<int64_t>(0, benefit[1]);
+
+    for (int i = 3; i < N; ++i)
+    {
+        if (benefit[i - 1] < 0)
+        {
+            dp[i] = std::max<int64_t>(dp[i - 3], dp[i - 2]);
+        }
+        else
+        {
+            dp[i] = std::max<int64_t>(dp[i - 3] + benefit[i - 1], dp[i - 2] + benefit[i - 1]);
+        }
+    }
+
+    Out() << std::max<int64_t>(dp[N - 1], dp[N - 2]) << std::endl;
 }
 
 //----------------------編集スペースここまで--------------------------
