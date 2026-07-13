@@ -1,7 +1,6 @@
 ﻿#ifndef ___INCLUDED_MAIN___
 #define ___INCLUDED_MAIN___
 
-#include <cstdint>
 #include <iostream>
 #include <sstream>
 #include <string>
