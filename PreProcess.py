@@ -66,7 +66,7 @@ def extract_source(filepath:str, curdir:str):
 
                     result += l
                 # ifdefを処理する
-                # すでにdefineされていたら無視判定を入れる
+                # まだdefineされていなければ無視判定を入れる
                 elif(re.match(IFDEF_RE, l)):
                     re_result = re.search(IFDEF_RE, l)
                     define_name = re_result.group("define_name")
