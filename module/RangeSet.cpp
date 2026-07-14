@@ -1,16 +1,16 @@
 ﻿#ifndef ___RANGE_SET___
 #define ___RANGE_SET___
 
-#include <set>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <set>
 
 //! @brief	区間をsetで管理する奴
 //! @tparam	T 管理する型(整数型のみ)
 template <class T>
 class RangeSet
 {
-public:
+  public:
     //! @brief	区間(閉区間)
     struct Range
     {
@@ -42,11 +42,11 @@ public:
         }
     };
 
-public:
+  public:
     static const T INF;               //!< 無限大
     static const Range INVALID_RANGE; //!< 無効区間
 
-public:
+  public:
     //! @brief デフォルトコンストラクタ
     RangeSet()
     {
@@ -76,6 +76,19 @@ public:
             return *itr;
         }
         return INVALID_RANGE;
+    }
+
+    //! @brief left以上で範囲に含まれない最小の数を取得
+    //! @param left 範囲の左端
+    //! @return left以上で範囲に含まれない最小の数
+    T GetMinExcluded(T left)
+    {
+        Range nearest = GetCoveredBy(left, left);
+        if (nearest == INVALID_RANGE)
+        {
+            return left;
+        }
+        return nearest.Right + 1;
     }
 
     //! @brief 区間を追加する
@@ -191,7 +204,7 @@ public:
         return sumErased;
     }
 
-private:
+  private:
     //! @brief 指定した点から最も近い位置にある範囲を取得
     //! @param pivot 指定した点
     //! @return 最も近い範囲を指すイテレータ
@@ -200,7 +213,7 @@ private:
         return std::prev(m_rangeSet.lower_bound(Range{.Left = pivot, .Right = pivot}));
     }
 
-private:
+  private:
     std::set<Range> m_rangeSet; //!< 区間が入るコンテナ
 };
 
