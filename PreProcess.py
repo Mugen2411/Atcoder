@@ -4,12 +4,12 @@ import sys
 import re
 
 result = ""
-num_skip = 0
+if_stack = [] # 末端にFalseがあれば無視、Trueなら有効
 defined_symbol = set()
 
 def extract_source(filepath:str, curdir:str):
     global result
-    global num_skip
+    global if_stack
     global defined_symbol
 
     fullpath = pathlib.Path(curdir, filepath)
@@ -20,20 +20,22 @@ def extract_source(filepath:str, curdir:str):
         INCLUDE_RE = r'^#include "(?P<include_path>[^\s]+)".*'
         DEFINE_RE = r'^#define[\s]+(?P<define_name>[^\s]+).*'
         IFNDEF_RE = r'^#ifndef[\s]+(?P<define_name>[^\s]+).*'
+        IFDEF_RE = r'^#ifdef[\s]+(?P<define_name>[^\s]+).*'
         ENDIF_RE = r'^#endif.*'
 
         for l in src_contents:
-            # ifndefにより無視される領域は全てのifndefを無視判定とする
+            # ifndefにより無視される領域は全てのifndefとifdefを無視判定とする
             # endifが来たら無視判定を取り下げていく
-            if num_skip != 0:
+            if len(if_stack) != 0 and not if_stack[-1]:
                 if(re.match(ENDIF_RE, l)):
                     result += l
-
-                    if(num_skip > 0):
-                        num_skip -= 1
+                    if_stack.pop()
                 elif(re.match(IFNDEF_RE, l)):
                     result += l
-                    num_skip += 1
+                    if_stack.append(False)
+                elif(re.match(IFDEF_RE, l)):
+                    result += l
+                    if_stack.append(False)
             
             else :
                 # includeを処理する
@@ -52,13 +54,26 @@ def extract_source(filepath:str, curdir:str):
                     defined_symbol.add(define_name)
 
                     result += l
-                # ifdefを処理する
+                # ifndefを処理する
                 # すでにdefineされていたら無視判定を入れる
                 elif(re.match(IFNDEF_RE, l)):
                     re_result = re.search(IFNDEF_RE, l)
                     define_name = re_result.group("define_name")
                     if(define_name in defined_symbol):
-                        num_skip += 1
+                        if_stack.append(False)
+                    else:
+                        if_stack.append(True)
+
+                    result += l
+                # ifdefを処理する
+                # すでにdefineされていたら無視判定を入れる
+                elif(re.match(IFDEF_RE, l)):
+                    re_result = re.search(IFDEF_RE, l)
+                    define_name = re_result.group("define_name")
+                    if(define_name not in defined_symbol):
+                        if_stack.append(False)
+                    else:
+                        if_stack.append(True)
 
                     result += l
                 # endifを処理する
@@ -66,8 +81,7 @@ def extract_source(filepath:str, curdir:str):
                 elif(re.match(ENDIF_RE, l)):
                     result += l
 
-                    if(num_skip > 0):
-                        num_skip -= 1
+                    if_stack.pop()
                 else:
                     result += l
 
