@@ -10,18 +10,7 @@ if exist %TARGET_NAME% del %TARGET_NAME%
 
 if not exist %~dp1 mkdir %~dp1
 
-type "BOM.bin" >> "%1"
-
-for %%F in ("%MODULE_DIR%\*.cpp") do (
-    echo "%%F"
-    rem 一旦BOMを消すためにANSIを通す
-    start /min /wait cmd /c chcp 65001 ^&; cmd /u /c type "%%F" ^> $$$ ^&; cmd /c type $$$ ^>^> "%1" ^&; del $$$
-
-    echo; >> "%1"
-)
-
-rem 一旦BOMを消すためにANSIを通す
-start /min /wait cmd /c chcp 65001 ^&; cmd /u /c type "template\main.cpp" ^> $$$ ^&; cmd /c type $$$ ^>^> "%1" ^&; del $$$
+copy "template\main.cpp" %TARGET_NAME%
 
 endlocal
 popd
