@@ -128,7 +128,7 @@ class Grid3D
         @param[in]    initialValue    初期値
     */
     Grid3D(int64_t height, int64_t width, int64_t depth, T initialValue)
-        : m_data(height * width, initialValue), m_width(width), m_height(height), m_depth(depth)
+        : m_data(height * width * depth, initialValue), m_width(width), m_height(height), m_depth(depth)
     {
     }
 
