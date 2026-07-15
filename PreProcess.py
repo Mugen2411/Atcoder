@@ -43,7 +43,7 @@ def extract_source(filepath:str, curdir:str):
                 if(re.match(INCLUDE_RE, l)):
                     re_result = re.search(INCLUDE_RE, l)
                     include_path = re_result.group("include_path")
-                    dirname = os.path.dirname(os.path.abspath(filepath))
+                    dirname = os.path.dirname(os.path.abspath(pathlib.Path(curdir, filepath)))
                     extract_source(include_path, dirname)
 
                 # defineを処理する

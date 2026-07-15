@@ -35,6 +35,20 @@ struct POSITION
         return POSITION(0, -1);
     }
 
+    //! @brief 前移動の差分を取得
+    //! @return 前移動の差分
+    static POSITION F()
+    {
+        return POSITION(0, 0, 1);
+    }
+
+    //! @brief 後移動の差分を取得
+    //! @return 後移動の差分
+    static POSITION B()
+    {
+        return POSITION(0, 0, -1);
+    }
+
     //! @brief RLDUから座標差分を取得する
     //! @param dir R,L,D,Uの文字
     //! @return 対応する方向
@@ -99,20 +113,21 @@ struct POSITION
 
   public:
     //! @brief デフォルトコンストラクタ
-    POSITION() : X(0), Y(0)
+    POSITION() : X(0), Y(0), Z(0)
     {
     }
 
     //! @brief コンストラクタ
     //! @param x
     //! @param y
-    POSITION(int64_t x, int64_t y) : X(x), Y(y)
+    //! @param z
+    POSITION(int64_t x, int64_t y, int64_t z = 0) : X(x), Y(y), Z(z)
     {
     }
 
     //! @brief コピーコンストラクタ
     //! @param rhs コピー元
-    POSITION(const POSITION &rhs) : X(rhs.X), Y(rhs.Y)
+    POSITION(const POSITION &rhs) : X(rhs.X), Y(rhs.Y), Z(rhs.Z)
     {
     }
 
@@ -123,6 +138,7 @@ struct POSITION
     {
         X = rhs.X;
         Y = rhs.Y;
+        Z = rhs.Z;
 
         return *this;
     }
@@ -134,6 +150,7 @@ struct POSITION
     {
         X += rhs.X;
         Y += rhs.Y;
+        Z += rhs.Z;
 
         return *this;
     }
@@ -145,6 +162,7 @@ struct POSITION
     {
         X -= rhs.X;
         Y -= rhs.Y;
+        Z -= rhs.Z;
 
         return *this;
     }
@@ -156,6 +174,7 @@ struct POSITION
     {
         X *= rhs.X;
         Y *= rhs.Y;
+        Z *= rhs.Z;
 
         return *this;
     }
@@ -196,6 +215,7 @@ struct POSITION
   public:
     int64_t X; //!< X座標
     int64_t Y; //!< Y座標
+    int64_t Z; //!< Z座標
 };
 
 #endif //___INCLUDED_POSITION___
