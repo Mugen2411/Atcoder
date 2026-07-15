@@ -1,4 +1,4 @@
-#ifndef __INCLUDED_GRID3D__
+﻿#ifndef __INCLUDED_GRID3D__
 #define __INCLUDED_GRID3D__
 
 #include "Position.cpp"
@@ -196,7 +196,7 @@ class Grid3D
     /**
         @brief    高さの取得
 
-        @return ���さ
+        @return   高さ
      */
     int64_t GetHeight() const
     {

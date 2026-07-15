@@ -1,4 +1,4 @@
-#ifndef ___INCLUDED_POSITION___
+﻿#ifndef ___INCLUDED_POSITION___
 #define ___INCLUDED_POSITION___
 
 #include <array>
