@@ -7,6 +7,10 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t H, W;
+    In() >> H >> W;
+
+    YesNo(W * 100 * 100 >= 25 * H * H);
     return;
 }
 
