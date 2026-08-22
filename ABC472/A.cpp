@@ -12,6 +12,16 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    std::string S;
+    In() >> S;
+    for (auto &c : S)
+    {
+        if (c != 'A')
+        {
+            c = '.';
+        }
+    }
+    Out() << S;
     return;
 }
 

@@ -23,7 +23,7 @@ class PrefixSum
         @note         旧互換用。1次元データ
     */
     template <class Iterator>
-    PrefixSum(Iterator beginItr, Iterator endItr) : m_data(2, std::distance(beginItr, endItr) + 1, 2, 0)
+    PrefixSum(Iterator beginItr, Iterator endItr) : m_data(2, std::distance(beginItr, endItr) + 1, 2, T())
     {
         int64_t curIdx = 0;
         for (auto itr = beginItr; itr != endItr; ++itr)
@@ -36,7 +36,7 @@ class PrefixSum
 
     //! @brief コンストラクタ
     //! @param input 元となるデータ
-    PrefixSum(Grid3D<T> &input) : m_data(input.GetHeight() + 1, input.GetWidth() + 1, input.GetDepth() + 1, 0)
+    PrefixSum(Grid3D<T> &input) : m_data(input.GetHeight() + 1, input.GetWidth() + 1, input.GetDepth() + 1, T())
     {
         for (int z = 0; z < input.GetDepth(); ++z)
         {
