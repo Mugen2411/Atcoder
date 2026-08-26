@@ -99,7 +99,7 @@ class RuntimeModInt
 
         while (exponent)
         {
-            if (exponent % 2)
+            if (exponent & 1)
             {
                 ans *= *this;
             }
