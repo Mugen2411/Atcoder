@@ -12,6 +12,17 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N;
+    In() >> N;
+    std::vector<int64_t> A(N);
+    EachInput(A);
+
+    int64_t ans = 0;
+    for (int i = N / 2; i < N; ++i)
+    {
+        ans += A[i];
+    }
+    Out() << ans;
     return;
 }
 
