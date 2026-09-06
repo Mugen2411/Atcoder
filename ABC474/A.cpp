@@ -12,6 +12,16 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    int X;
+    In() >> X;
+    if (X == 1)
+    {
+        Out() << "2";
+    }
+    else
+    {
+        Out() << "1";
+    }
     return;
 }
 

@@ -12,6 +12,25 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    int64_t N;
+    In() >> N;
+    std::vector<int64_t> P(N);
+    EachInput(P);
+    for (auto &p : P)
+    {
+        --p;
+    }
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (P[i] / 10 != i / 10)
+        {
+            No();
+            return;
+        }
+    }
+    Yes();
+
     return;
 }
 
