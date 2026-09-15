@@ -79,6 +79,8 @@ class BeamSearch
             {
                 break;
             }
+
+            currentBeam[0].Output();
         }
 
         return currentBeam[0];
@@ -203,6 +205,35 @@ class State
         return m_length;
     }
 
+    void Output()
+    {
+        struct BRICK
+        {
+            int64_t x, y, l;
+        };
+        std::vector<BRICK> ans;
+        int lenIdx = 0;
+        auto &holes = RefHoles();
+        auto &length = RefLength();
+        for (int y = m_H - 1; y >= 0; --y)
+        {
+            auto &cur = holes[y];
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (cur.Get(x))
+                {
+                    ans.push_back(BRICK{.x = x - length[lenIdx] / 2, .y = y, .l = length[lenIdx]});
+                    ++lenIdx;
+                }
+            }
+        }
+        std::cout << ans.size() << std::endl;
+        for (auto &b : ans)
+        {
+            std::cout << b.x << " " << b.y << " " << b.l << std::endl;
+        }
+    }
+
   private:
     int64_t m_score;
     std::function<BitManager(int)> m_getWallFunc;
@@ -236,31 +267,7 @@ void AtcoderSolveHelper::Solve()
     State result = bs.SearchLesser(init);
 
     // 以下解答出力
-    struct BRICK
-    {
-        int64_t x, y, l;
-    };
-    std::vector<BRICK> ans;
-    int lenIdx = 0;
-    auto &holes = result.RefHoles();
-    auto &length = result.RefLength();
-    for (int y = H - 1; y >= 0; --y)
-    {
-        auto &cur = holes[y];
-        for (int x = 0; x < W; ++x)
-        {
-            if (cur.Get(x))
-            {
-                ans.push_back(BRICK{.x = x - length[lenIdx] / 2, .y = y, .l = length[lenIdx]});
-                ++lenIdx;
-            }
-        }
-    }
-    Out() << ans.size() << std::endl;
-    for (auto &b : ans)
-    {
-        Out() << b.x << " " << b.y << " " << b.l << std::endl;
-    }
+    result.Output();
 
     return;
 }
