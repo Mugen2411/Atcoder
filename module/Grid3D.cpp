@@ -119,6 +119,10 @@ class Grid3D
     };
 
   public:
+    //! @brief デフォルトコンストラクタ
+    Grid3D() : m_data(), m_width(0), m_height(0), m_depth(0)
+    {
+    }
     /**
         @brief    コンストラクタ
 
