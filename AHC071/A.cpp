@@ -147,7 +147,6 @@ class State
         {
             --m_curY;
             m_curX = 0;
-            m_remainHole = 0;
             currentLine = m_curY >= 0 ? m_getWallFunc(m_curY) : BitManager::AllFalse();
             nextBeam.push_back(*this);
             return;
@@ -187,7 +186,7 @@ class State
 
     int64_t GetScore() const
     {
-        return m_score + m_remainHole * 20 + m_entropy * 5;
+        return m_score + m_remainHole * 20;
     }
 
     bool operator<(const State &rhs) const
@@ -243,7 +242,6 @@ class State
     std::vector<BitManager> m_addedHole;
     std::vector<int> m_length;
     int m_remainHole;
-    int m_entropy;
 };
 void AtcoderSolveHelper::Solve()
 {
