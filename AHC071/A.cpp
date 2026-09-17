@@ -25,8 +25,16 @@ class State
 
     State(std::function<BitManager(int)> getWallFunc, std::function<int(int)> getCostFunc, int H, int W)
         : m_score(0), m_getWallFunc(getWallFunc), m_getCostFunc(getCostFunc), m_H(H), m_W(W), m_curY(H - 1), m_curX(0),
-          m_addedHole(H), m_remainHole(120)
+          m_addedHole(H), m_remainHole(120), m_entropy(0)
     {
+        BitManager first = m_getWallFunc(m_curY - 1);
+        for (int x = 0; x < m_W; ++x)
+        {
+            if (first.Get(x))
+            {
+                m_entropy += (x - m_W / 2) * (x - m_W / 2);
+            }
+        }
     }
 
     void Expand(std::vector<State> &nextBeam)
@@ -55,7 +63,15 @@ class State
         {
             --m_curY;
             m_curX = 0;
-            currentLine = m_curY >= 0 ? m_getWallFunc(m_curY) : BitManager::AllFalse();
+            currentLine = m_curY >= 1 ? m_getWallFunc(m_curY - 1) : BitManager::AllFalse();
+            m_entropy = 0;
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (currentLine.Get(x))
+                {
+                    m_entropy += (x - m_W / 2) * (x - m_W / 2);
+                }
+            }
             nextBeam.push_back(*this);
             return;
         }
@@ -73,6 +89,7 @@ class State
             tmp.m_curX = leftHole + l;
             tmp.m_addedHole[m_curY].Set(leftHole + idx, true);
             tmp.m_length.push_back(l);
+            tmp.m_entropy += (leftHole + idx - m_W / 2) * (leftHole + idx - m_W / 2);
             for (int x = leftHole; x < tmp.m_curX; ++x)
             {
                 if (currentLine.Get(x) || prevHole.Get(x))
@@ -94,7 +111,7 @@ class State
 
     int64_t GetScore() const
     {
-        return m_score + m_remainHole * 20;
+        return m_score + m_remainHole * 20 + std::sqrt(m_entropy);
     }
 
     bool operator<(const State &rhs) const
@@ -150,6 +167,7 @@ class State
     std::vector<BitManager> m_addedHole;
     std::vector<int> m_length;
     int m_remainHole;
+    int64_t m_entropy;
 };
 void AtcoderSolveHelper::Solve()
 {
@@ -169,7 +187,7 @@ void AtcoderSolveHelper::Solve()
 
     State init([&Wall](int y) -> BitManager { return Wall[y]; }, [&c](int idx) -> int { return c[idx]; }, H, W);
 
-    BeamSearch<State> bs(3000);
+    BeamSearch<State> bs(4000);
     State result = bs.SearchLesser(init);
 
     // 以下解答出力
