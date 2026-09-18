@@ -25,7 +25,7 @@ class State
 
     State(std::function<BitManager(int)> getWallFunc, std::function<int(int)> getCostFunc, int H, int W)
         : m_score(0), m_getWallFunc(getWallFunc), m_getCostFunc(getCostFunc), m_H(H), m_W(W), m_curY(H - 1), m_curX(0),
-          m_addedHole(H), m_remainHole(120), m_entropy(0)
+          m_addedHole(H), m_remainHole(0), m_entropy(0)
     {
         BitManager first = m_getWallFunc(m_curY - 1);
         for (int x = 0; x < m_W; ++x)
@@ -33,6 +33,18 @@ class State
             if (first.Get(x))
             {
                 m_entropy += (x - m_W / 2) * (x - m_W / 2);
+            }
+        }
+
+        for (int y = H - 1; y >= 0; --y)
+        {
+            BitManager cur = m_getWallFunc(y);
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (cur.Get(x))
+                {
+                    m_remainHole += 1;
+                }
             }
         }
     }
@@ -76,29 +88,46 @@ class State
             return;
         }
 
-        // 同程度に効率よく穴をふさげる全ての置き方を試す
-        for (int idx = 0; idx < 5; ++idx)
+        BitManager nextLine = (m_curY > 0) ? m_getWallFunc(m_curY - 1) : BitManager::AllFalse();
+
+        // 2歩ほど手前からおいてみる
+        for (int b = 0; b < 3; ++b)
         {
-            int l = idx * 2 + 1;
-            if (leftHole + l > m_W)
+            int lpos = leftHole - b;
+            if (lpos < m_curX)
             {
                 continue;
             }
-            State tmp(*this);
-            tmp.m_score += m_getCostFunc(idx);
-            tmp.m_curX = leftHole + l;
-            tmp.m_addedHole[m_curY].Set(leftHole + idx, true);
-            tmp.m_length.push_back(l);
-            tmp.m_entropy += (leftHole + idx - m_W / 2) * (leftHole + idx - m_W / 2);
-            for (int x = leftHole; x < tmp.m_curX; ++x)
+            // 同程度に効率よく穴をふさげる全ての置き方を試す
+            for (int idx = (b + 1) / 2; idx < 5; ++idx)
             {
-                if (currentLine.Get(x) || prevHole.Get(x))
+                int l = idx * 2 + 1;
+                if (lpos + l > m_W)
                 {
-                    --tmp.m_remainHole;
+                    continue;
                 }
+                State tmp(*this);
+                tmp.m_score += m_getCostFunc(idx);
+                tmp.m_curX = lpos + l;
+                tmp.m_addedHole[m_curY].Set(lpos + idx, true);
+                if (m_curY > 0)
+                {
+                    if (!nextLine.Get(lpos + idx))
+                    {
+                        tmp.m_remainHole += 1;
+                    }
+                }
+                tmp.m_length.push_back(l);
+                tmp.m_entropy += (lpos + idx - m_W / 2) * (lpos + idx - m_W / 2);
+                for (int x = lpos; x < tmp.m_curX; ++x)
+                {
+                    if (currentLine.Get(x) || prevHole.Get(x))
+                    {
+                        tmp.m_remainHole -= 1;
+                    }
+                }
+                nextBeam.emplace_back(tmp);
             }
-            ++tmp.m_remainHole;
-            nextBeam.emplace_back(tmp);
         }
 
         //std::cerr << nextBeam.size() << std::endl;
@@ -106,12 +135,12 @@ class State
 
     bool IsFinished() const
     {
-        return m_curY < 0;
+        return m_remainHole <= 0;
     }
 
     int64_t GetScore() const
     {
-        return m_score + m_remainHole * 20 + std::sqrt(m_entropy);
+        return m_score + m_remainHole * 10; // + std::sqrt(m_entropy);
     }
 
     bool operator<(const State &rhs) const
@@ -187,7 +216,7 @@ void AtcoderSolveHelper::Solve()
 
     State init([&Wall](int y) -> BitManager { return Wall[y]; }, [&c](int idx) -> int { return c[idx]; }, H, W);
 
-    BeamSearch<State> bs(4000);
+    BeamSearch<State> bs(2000);
     State result = bs.SearchLesser(init);
 
     // 以下解答出力

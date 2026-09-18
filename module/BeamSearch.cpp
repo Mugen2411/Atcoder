@@ -62,8 +62,9 @@ class BeamSearch
             {
                 break;
             }
-
+#ifndef ATCODER
             currentBeam[0].Output();
+#endif //ATCODER
         }
 
         return currentBeam[0];
