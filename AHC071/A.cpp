@@ -3,6 +3,8 @@
 
 //#define ENABLE_MULTICASE //!< マルチケース用スイッチ：マルチケースの場合はコメント解除
 
+#include "../module/BeamSearch.cpp"
+#include "../module/BitManager.cpp"
 #include "../module/Grid2D.cpp"
 #include "../module/Helper.cpp"
 #include <algorithm>
@@ -14,197 +16,211 @@
 #include <unordered_map>
 #include <vector>
 
+class State
+{
+  public:
+    State()
+    {
+    }
+
+    State(std::function<BitManager(int)> getWallFunc, std::function<int(int)> getCostFunc, int H, int W)
+        : m_score(0), m_getWallFunc(getWallFunc), m_getCostFunc(getCostFunc), m_H(H), m_W(W), m_curY(H - 1), m_curX(0),
+          m_addedHole(H), m_remainHole(0), m_entropy(0)
+    {
+        BitManager first = m_getWallFunc(m_curY - 1);
+        for (int x = 0; x < m_W; ++x)
+        {
+            if (first.Get(x))
+            {
+                m_entropy += (x - m_W / 2) * (x - m_W / 2);
+            }
+        }
+
+        for (int y = H - 1; y >= 0; --y)
+        {
+            BitManager cur = m_getWallFunc(y);
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (cur.Get(x))
+                {
+                    m_remainHole += 1;
+                }
+            }
+        }
+    }
+
+    void Expand(std::vector<State> &nextBeam)
+    {
+        if (IsFinished())
+        {
+            nextBeam.push_back(*this);
+            return;
+        }
+        BitManager currentLine = m_getWallFunc(m_curY);
+        BitManager prevHole = m_curY < m_H - 1 ? m_addedHole[m_curY + 1] : BitManager::AllFalse();
+
+        // 今見るべき領域で一番左にある穴を検出
+        int leftHole = -1;
+        for (int x = m_curX; x < m_W; ++x)
+        {
+            if (currentLine.Get(x) || prevHole.Get(x))
+            {
+                leftHole = x;
+                break;
+            }
+        }
+
+        // もう塞ぐべき穴がない
+        if (leftHole == -1)
+        {
+            --m_curY;
+            m_curX = 0;
+            currentLine = m_curY >= 1 ? m_getWallFunc(m_curY - 1) : BitManager::AllFalse();
+            m_entropy = 0;
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (currentLine.Get(x))
+                {
+                    m_entropy += (x - m_W / 2) * (x - m_W / 2);
+                }
+            }
+            nextBeam.push_back(*this);
+            return;
+        }
+
+        BitManager nextLine = (m_curY > 0) ? m_getWallFunc(m_curY - 1) : BitManager::AllFalse();
+
+        // 2歩ほど手前からおいてみる
+        for (int b = 0; b < 3; ++b)
+        {
+            int lpos = leftHole - b;
+            if (lpos < m_curX)
+            {
+                continue;
+            }
+            // 同程度に効率よく穴をふさげる全ての置き方を試す
+            for (int idx = (b + 1) / 2; idx < 5; ++idx)
+            {
+                int l = idx * 2 + 1;
+                if (lpos + l > m_W)
+                {
+                    continue;
+                }
+                State tmp(*this);
+                tmp.m_score += m_getCostFunc(idx);
+                tmp.m_curX = lpos + l;
+                tmp.m_addedHole[m_curY].Set(lpos + idx, true);
+                if (m_curY > 0)
+                {
+                    if (!nextLine.Get(lpos + idx))
+                    {
+                        tmp.m_remainHole += 1;
+                    }
+                }
+                tmp.m_length.push_back(l);
+                tmp.m_entropy += (lpos + idx - m_W / 2) * (lpos + idx - m_W / 2);
+                for (int x = lpos; x < tmp.m_curX; ++x)
+                {
+                    if (currentLine.Get(x) || prevHole.Get(x))
+                    {
+                        tmp.m_remainHole -= 1;
+                    }
+                }
+                nextBeam.emplace_back(tmp);
+            }
+        }
+
+        //std::cerr << nextBeam.size() << std::endl;
+    }
+
+    bool IsFinished() const
+    {
+        return m_remainHole <= 0;
+    }
+
+    int64_t GetScore() const
+    {
+        return m_score + m_remainHole * 10; // + std::sqrt(m_entropy);
+    }
+
+    bool operator<(const State &rhs) const
+    {
+        return GetScore() < rhs.GetScore();
+    }
+
+    std::vector<BitManager> &RefHoles()
+    {
+        return m_addedHole;
+    }
+
+    std::vector<int> &RefLength()
+    {
+        return m_length;
+    }
+
+    void Output()
+    {
+        struct BRICK
+        {
+            int64_t x, y, l;
+        };
+        std::vector<BRICK> ans;
+        int lenIdx = 0;
+        auto &holes = RefHoles();
+        auto &length = RefLength();
+        for (int y = m_H - 1; y >= 0; --y)
+        {
+            auto &cur = holes[y];
+            for (int x = 0; x < m_W; ++x)
+            {
+                if (cur.Get(x))
+                {
+                    ans.push_back(BRICK{.x = x - length[lenIdx] / 2, .y = y, .l = length[lenIdx]});
+                    ++lenIdx;
+                }
+            }
+        }
+        std::cout << ans.size() << std::endl;
+        for (auto &b : ans)
+        {
+            std::cout << b.x << " " << b.y << " " << b.l << std::endl;
+        }
+    }
+
+  private:
+    int64_t m_score;
+    std::function<BitManager(int)> m_getWallFunc;
+    std::function<int(int)> m_getCostFunc;
+    int m_H, m_W;
+    int m_curY, m_curX;
+    std::vector<BitManager> m_addedHole;
+    std::vector<int> m_length;
+    int m_remainHole;
+    int64_t m_entropy;
+};
 void AtcoderSolveHelper::Solve()
 {
     auto startTime = std::chrono::system_clock::now();
 
     int64_t W, H, K;
     In() >> W >> H >> K;
-    std::vector<int64_t> c(5);
+    std::array<int64_t, 5> c;
     EachInput(c);
-    std::vector<int64_t> length({1, 3, 5, 7, 9});
-    std::vector<int64_t> order({0, 1, 2, 3, 4});
-    std::vector<std::function<void(std::vector<int64_t> &)>> GetPivotFunc;
-    for (auto l : length)
-    {
-        GetPivotFunc.push_back([l](std::vector<int64_t> &out) { out.push_back(l / 2); });
-    }
-    std::random_device seedGen;
-    std::mt19937 rnd(seedGen());
-
-    Grid2D<char> Wall(H, W, '#');
+    std::vector<BitManager> Wall(H);
     for (int i = 0; i < K; ++i)
     {
         int64_t a, b;
         In() >> a >> b;
-        Wall.Ref(a, b) = '.';
+        Wall[b].Set(a, true);
     }
 
-    struct BRICK
-    {
-        int64_t x, y, l;
-    };
-    std::vector<BRICK> ans;
-    int64_t ansScore = W * H * c[0];
+    State init([&Wall](int y) -> BitManager { return Wall[y]; }, [&c](int idx) -> int { return c[idx]; }, H, W);
 
-    while (1)
-    {
-        std::vector<BRICK> tmp;
-        Grid2D<char> CurWall(Wall);
-        int64_t curScore = 0;
-        for (int64_t y = H - 1; y > 0; --y)
-        {
-            for (int64_t x = 0; x < W; ++x)
-            {
-                if (CurWall.Ref(x, y) != '.')
-                {
-                    continue;
-                }
-                std::vector<int64_t> score(length.size(), 0);
-                int64_t mx = 0;
-                // 出来るだけ長いレンガを用いて一気に覆うことを考える
-                for (int i = 0; i < length.size(); ++i)
-                {
-                    if (x + length[i] > W)
-                    {
-                        continue;
-                    }
-                    for (int j = 0; j < length[i]; ++j)
-                    {
-                        if (CurWall.Ref(x + j, y) == '.')
-                        {
-                            mx = std::max<int64_t>(mx, ++score[i]);
-                        }
-                    }
-                }
-                if (mx == 0)
-                {
-                    continue;
-                }
-
-                // コストが同じレンガをシャッフルして上振れ引きたい
-                std::shuffle(order.begin(), order.end(), rnd);
-                std::stable_sort(order.begin(), order.end(), [&](int64_t lhs, int64_t rhs) { return c[lhs] < c[rhs]; });
-                // 使うべきレンガを使ったことをシミュレーションする
-                for (auto i : order)
-                {
-                    if (score[i] == mx)
-                    {
-                        curScore += c[i];
-                        tmp.push_back(BRICK{.x = x, .y = y, .l = length[i]});
-                        for (int j = 0; j < length[i]; ++j)
-                        {
-                            CurWall.Ref(x + j, y) = '_';
-                        }
-                        if (y != 0)
-                        {
-                            // 支えるべき場所を穴とする
-                            std::vector<int64_t> pivot;
-                            GetPivotFunc[i](pivot);
-                            for (auto p : pivot)
-                            {
-                                CurWall.Ref(x + p, y - 1) = '.';
-                            }
-                        }
-                        CurWall.Ref(x, y) = i + '0';
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 最下段はつなげるインセンティブが無いので1ずつを検討する
-        for (int64_t x = 0; x < W; ++x)
-        {
-            if (CurWall.Ref(x, 0) != '.')
-            {
-                continue;
-            }
-            std::vector<int64_t> score(length.size(), 0);
-            int64_t mx = 0;
-            // 出来るだけ長いレンガを用いて一気に覆うことを考える
-            for (int i = 0; i < length.size(); ++i)
-            {
-                if (x + length[i] > W)
-                {
-                    continue;
-                }
-                for (int j = 0; j < length[i]; ++j)
-                {
-                    if (CurWall.Ref(x + j, 0) == '.')
-                    {
-                        mx = std::max<int64_t>(mx, ++score[i]);
-                    }
-                }
-            }
-            if (mx == 0)
-            {
-                continue;
-            }
-            // コストが同じならでかい方がお得
-            std::stable_sort(order.begin(), order.end(), [&](int64_t lhs, int64_t rhs) {
-                if (c[lhs] < c[rhs])
-                {
-                    return true;
-                }
-                if (c[lhs] > c[rhs])
-                {
-                    return true;
-                }
-                return length[lhs] < length[rhs];
-            });
-            // 使うべきレンガを使ったことをシミュレーションする
-            for (auto i : order)
-            {
-                if (score[i] == mx)
-                {
-                    // もし1つずつ覆った方が安いならそれでよい
-                    if (c[i] > c[0] * score[i])
-                    {
-                        for (int j = 0; j < length[i]; ++j)
-                        {
-                            if (CurWall.Ref(x + j, 0) == '.')
-                            {
-                                curScore += c[0];
-                                tmp.push_back(BRICK{.x = x + j, .y = 0, .l = length[0]});
-                                CurWall.Ref(x + j, 0) = '0';
-                            }
-                        }
-                        break;
-                    }
-                    curScore += c[i];
-                    tmp.push_back(BRICK{.x = x, .y = 0, .l = length[i]});
-                    for (int j = 0; j < length[i]; ++j)
-                    {
-                        CurWall.Ref(x + j, 0) = '_';
-                    }
-                    CurWall.Ref(x, 0) = i + '0';
-                    break;
-                }
-            }
-        }
-
-        if (ansScore > curScore)
-        {
-            ansScore = curScore;
-            std::swap(ans, tmp);
-            tmp.clear();
-        }
-
-        auto endTime = std::chrono::system_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-        if (elapsed > 1950)
-        {
-            break;
-        }
-    }
+    BeamSearch<State> bs(2000);
+    State result = bs.SearchLesser(init);
 
     // 以下解答出力
-    Out() << ans.size() << std::endl;
-    for (auto &b : ans)
-    {
-        Out() << b.x << " " << b.y << " " << b.l << std::endl;
-    }
+    result.Output();
 
     return;
 }
