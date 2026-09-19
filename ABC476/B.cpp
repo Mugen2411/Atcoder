@@ -12,6 +12,20 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    int N;
+    In() >> N;
+    std::string S, T;
+    In() >> S >> T;
+
+    for (int i = 0; i < N; ++i)
+    {
+        if (T[i] != '*' && T[i] != S[i])
+        {
+            No();
+            return;
+        }
+    }
+    Yes();
     return;
 }
 

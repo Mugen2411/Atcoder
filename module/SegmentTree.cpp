@@ -27,6 +27,7 @@ class SegmentTree
     SegmentTree(size_t size, T limitValue, MergeFuncType compareFunc)
         : m_data(size * 4, limitValue), m_size(0), LIMIT_VALUE(limitValue), m_mergeFunc(compareFunc)
     {
+        m_realSize = size + 1;
         int x = 1;
         while (size > x)
         {
@@ -204,11 +205,20 @@ class SegmentTree
         return FindLeftImpl(queryL, queryR, cond, currentIdx * 2 + 2, (rangeBegins + rangeEnds) / 2, rangeEnds);
     }
 
+    //! @brief 配列として要素を取得する
+    //! @param idx インデックス(0～データ数)
+    //! @return インデックスに対応する実数値
+    T operator[](int64_t idx) const
+    {
+        return m_data[idx + m_size - 1];
+    }
+
   private:
     std::vector<T> m_data;     //!< 管理されるデータ本体
     size_t m_size;             //!< 管理部分を除いた本体のサイズ
     const T LIMIT_VALUE;       //!< 単位元
     MergeFuncType m_mergeFunc; //!< 比較関数
+    size_t m_realSize;
 
   public:
     static const size_t INVALID; //!< 不正を示す定数

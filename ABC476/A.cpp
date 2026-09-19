@@ -12,6 +12,18 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    std::string S;
+    In() >> S;
+    if (S.back() == 'e')
+    {
+        S.push_back('r');
+    }
+    else
+    {
+        S.push_back('e');
+        S.push_back('r');
+    }
+    Out() << S;
     return;
 }
 
