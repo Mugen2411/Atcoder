@@ -25,7 +25,7 @@ class SegmentTree
         @param[in]    compareFunc   比較関数
     */
     SegmentTree(size_t size, T limitValue, MergeFuncType compareFunc)
-        : m_data(size * 4, limitValue), m_size(0), LIMIT_VALUE(limitValue), m_mergeFunc(compareFunc)
+        : m_data(), m_size(0), LIMIT_VALUE(limitValue), m_mergeFunc(compareFunc)
     {
         m_realSize = size + 1;
         int x = 1;
@@ -34,6 +34,8 @@ class SegmentTree
             x *= 2;
         }
         m_size = x;
+
+        m_data.resize(m_size * 2 - 1, limitValue);
     }
 
     /**
@@ -225,7 +227,7 @@ class SegmentTree
     size_t m_size;             //!< 管理部分を除いた本体のサイズ
     const T LIMIT_VALUE;       //!< 単位元
     MergeFuncType m_mergeFunc; //!< 比較関数
-    size_t m_realSize;
+    size_t m_realSize;         //!< 使い手が宣言した要素数
 
   public:
     static const size_t INVALID; //!< 不正を示す定数
