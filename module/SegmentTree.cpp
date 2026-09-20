@@ -213,6 +213,13 @@ class SegmentTree
         return m_data[idx + m_size - 1];
     }
 
+    //! @brief 配列としての要素数
+    //! @return 要素数
+    size_t GetSize() const
+    {
+        return m_realSize;
+    }
+
   private:
     std::vector<T> m_data;     //!< 管理されるデータ本体
     size_t m_size;             //!< 管理部分を除いた本体のサイズ
