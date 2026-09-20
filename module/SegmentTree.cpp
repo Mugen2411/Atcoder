@@ -27,7 +27,7 @@ class SegmentTree
     SegmentTree(size_t size, T limitValue, MergeFuncType compareFunc)
         : m_data(), m_size(0), LIMIT_VALUE(limitValue), m_mergeFunc(compareFunc)
     {
-        m_realSize = size + 1;
+        m_realSize = size;
         int x = 1;
         while (size > x)
         {
@@ -235,5 +235,28 @@ class SegmentTree
 
 template <class T>
 const size_t SegmentTree<T>::INVALID = std::numeric_limits<size_t>::max();
+
+/**
+    @brief            入力ストリーム演算子
+
+    @tparam    T       セグ木に格納する型
+    @param[in]        stream  入力ストリーム
+    @param[in]        dest    入力を受け付ける先のGrid2D
+
+    @return                 入力ストリーム
+ */
+template <class T>
+std::istream &operator>>(std::istream &stream, SegmentTree<T> &dest)
+{
+    for (int idx = 0; idx < dest.GetSize(); ++idx)
+    {
+        T tmp;
+        stream >> tmp;
+
+        dest.Update(idx, tmp);
+    }
+
+    return stream;
+}
 
 #endif //___INCLUDED_SEGMENT_TREE___

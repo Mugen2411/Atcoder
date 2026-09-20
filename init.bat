@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 rem ファイルパスを設定
 set folderName=%1
-set generateName="gen_main.cpp"
+set generateName=gen_main.cpp
 
 rem ブランチ切ってチェックアウト
 git checkout master
