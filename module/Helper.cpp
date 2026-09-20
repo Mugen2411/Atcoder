@@ -26,6 +26,9 @@ class AtcoderSolveHelper
      */
     void Run()
     {
+        std::cin.tie(nullptr);
+        std::ios::sync_with_stdio(false);
+
         int64_t numTestCases = 1;
 #ifdef ENABLE_MULTICASE
         In() >> numTestCases;
