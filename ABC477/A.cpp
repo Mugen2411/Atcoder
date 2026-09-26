@@ -12,6 +12,21 @@
 
 void AtcoderSolveHelper::Solve()
 {
+    char c;
+    In() >> c;
+
+    switch (c)
+    {
+    case 'B':
+        Out() << 'Y';
+        return;
+    case 'Y':
+        Out() << 'R';
+        return;
+    case 'R':
+        Out() << 'B';
+        return;
+    }
     return;
 }
 
